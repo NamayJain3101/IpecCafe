@@ -12,6 +12,7 @@ import Meta from '../Components/Meta'
 const ProductScreen = ({ match, history }) => {
 
     const [rating, setRating] = useState(0);
+    const [qty, setQty] = useState(1);
     const [comment, setComment] = useState('');
 
     const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const ProductScreen = ({ match, history }) => {
     }, [dispatch, match, successProductReview])
 
     const addToCartHandler = () => {
-        history.push(`/cart/${match.params.id}`)
+        history.push(`/cart/${match.params.id}?qty=${qty}`)
     }
 
     const submitHandler = (e) => {

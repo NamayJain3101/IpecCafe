@@ -9,6 +9,7 @@ import Message from '../Components/Message'
 const CartScreen = ({ match, location, history }) => {
 
     const productId = match.params.id
+    const qty = location.search ? Number(location.search.split('=')[1]) : 1
 
     const cart = useSelector(state => state.cart)
     const { cartItems } = cart
@@ -16,9 +17,9 @@ const CartScreen = ({ match, location, history }) => {
     const dispatch = useDispatch();
     useEffect(() => {
         if (productId) {
-            dispatch(addToCart(productId))
+            dispatch(addToCart(productId, qty))
         }
-    }, [dispatch, productId])
+    }, [dispatch, productId, qty])
 
     const removeFromCartHandler = (id) => {
         dispatch(removeFromCart(id))
