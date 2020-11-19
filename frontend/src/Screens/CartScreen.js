@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Button, Card, Col, Form, Image, ListGroup, ListGroupItem, Row } from 'react-bootstrap'
+import { Button, Card, Col, Image, ListGroup, ListGroupItem, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { FaTrash } from 'react-icons/fa'
@@ -26,7 +26,7 @@ const CartScreen = ({ match, location, history }) => {
     }
 
     const checkoutHandler = (id) => {
-        history.push('/login?redirect=shipping')
+        history.push('/login?redirect=payment')
     }
 
     return (
@@ -56,13 +56,6 @@ const CartScreen = ({ match, location, history }) => {
                                                     </Col>
                                                     <Col md={2}>
                                                         &#8377;{item.price}
-                                                    </Col>
-                                                    <Col md={2}>
-                                                        <Form.Control as='select' value={item.qty} onChange={(e) => dispatch(addToCart(item.product, Number(e.target.value)))}>
-                                                            {[...Array(item.countInStock).keys()].map(x => (
-                                                                <option key={x + 1} value={x + 1}>{x + 1}</option>
-                                                            ))}
-                                                        </Form.Control>
                                                     </Col>
                                                     <Col md={2}>
                                                         <Button type='button' variant='danger' onClick={() => removeFromCartHandler(item.product)}>

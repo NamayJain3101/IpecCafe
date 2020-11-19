@@ -1,18 +1,11 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Button, Col, Form, FormCheck, FormGroup, FormLabel } from 'react-bootstrap'
 import FormContainer from '../Components/FormContainer'
 import { savePaymentMethod } from '../Actions/cartActions'
 import CheckoutSteps from '../Components/CheckoutSteps'
 
 const PaymentScreen = ({ history }) => {
-
-    const cart = useSelector(state => state.cart)
-    const { shippingAddress } = cart;
-
-    if (!shippingAddress) {
-        history.push('/shipping')
-    }
 
     const [paymentMethod, setPaymentMethod] = useState('PayPal')
 
@@ -42,10 +35,10 @@ const PaymentScreen = ({ history }) => {
                             checked onChange={(e) => setPaymentMethod(e.target.value)} >
                         </FormCheck>
                         <FormCheck type='radio'
-                            label='Cash on Delivery'
-                            id='COD'
+                            label='Cash'
+                            id='Cash'
                             name='paymentMethod'
-                            value='COD'
+                            value='Cash'
                             onChange={(e) => setPaymentMethod(e.target.value)} >
                         </FormCheck>
                         <FormCheck type='radio'

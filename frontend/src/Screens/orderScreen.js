@@ -97,13 +97,11 @@ const OrderScreen = ({ match, history }) => {
             },
             update_time: Date.now()
         }))
-        // if (successPay) {
         const wallet = user.wallet - order.totalPrice
         dispatch(updateUserDetails({
             id: user._id,
             wallet: wallet.toFixed(2)
         }))
-        // }
     }
 
     const deliverHandler = () => {
@@ -120,15 +118,11 @@ const OrderScreen = ({ match, history }) => {
                         <Col md={8}>
                             <ListGroup variant='flush'>
                                 <ListGroupItem>
-                                    <h2>Shipping</h2>
+                                    <h2>USER</h2>
                                     <p><strong>Name: </strong>{order.user.name.toUpperCase()}</p>
                                     <p>
                                         <strong>Email: </strong>
                                         <a href={`mailto: ${order.user.email}`}>{order.user.email}</a>
-                                    </p>
-                                    <p>
-                                        <strong>Address: </strong>
-                                        {order.shippingAddress.address}, {order.shippingAddress.city} {order.shippingAddress.postalCode}, {order.shippingAddress.country}
                                     </p>
                                     {order.isDelivered
                                         ? <Message variant='success'>Delivered on {order.deliveredAt}</Message>
@@ -141,9 +135,9 @@ const OrderScreen = ({ match, history }) => {
                                         <strong>Method: </strong>
                                         {order.paymentMethod}
                                     </p>
-                                    {order.isPaid && order.paymentMethod !== 'COD'
+                                    {order.isPaid && order.paymentMethod !== 'Cash'
                                         ? <Message variant='success'>Paid on {order.paidAt}</Message>
-                                        : (order.isPaid && order.paymentMethod === 'COD')
+                                        : (order.isPaid && order.paymentMethod === 'Cash')
                                             ? <Message variant='success'>Pay On Delivery</Message>
                                             : <Message variant='danger'>Not Paid</Message>
                                     }
@@ -190,12 +184,6 @@ const OrderScreen = ({ match, history }) => {
                                     </ListGroupItem>
                                     <ListGroupItem>
                                         <Row>
-                                            <Col>Shipping</Col>
-                                            <Col>&#8377;{order.shippingPrice}</Col>
-                                        </Row>
-                                    </ListGroupItem>
-                                    <ListGroupItem>
-                                        <Row>
                                             <Col>Tax</Col>
                                             <Col>&#8377;{order.taxPrice}</Col>
                                         </Row>
@@ -214,7 +202,7 @@ const OrderScreen = ({ match, history }) => {
                                             )}
                                         </ListGroupItem>
                                     )}
-                                    {!order.isPaid && (order.paymentMethod === 'COD') && (
+                                    {!order.isPaid && (order.paymentMethod === 'Cash') && (
                                         <ListGroupItem>
                                             <Button onClick={codPaymentHandler} className='btn btn-block'>Pay On Delivery</Button>
                                         </ListGroupItem>

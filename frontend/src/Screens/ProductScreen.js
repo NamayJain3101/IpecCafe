@@ -11,8 +11,8 @@ import Meta from '../Components/Meta'
 
 const ProductScreen = ({ match, history }) => {
 
-    const [qty, setQty] = useState(1);
     const [rating, setRating] = useState(0);
+    const [qty, setQty] = useState(1);
     const [comment, setComment] = useState('');
 
     const dispatch = useDispatch();
@@ -72,9 +72,6 @@ const ProductScreen = ({ match, history }) => {
                                 <ListGroupItem>
                                     Price: &#8377;{product.price}
                                 </ListGroupItem>
-                                <ListGroupItem>
-                                    Description: {product.description}
-                                </ListGroupItem>
                             </ListGroup>
                         </Col>
                         <Col md={3}>
@@ -90,29 +87,15 @@ const ProductScreen = ({ match, history }) => {
                                         <Row>
                                             <Col>Status: </Col>
                                             <Col>
-                                                {product.countInStock > 0 ? "In Stock" : "Out Of Stock"}
+                                                {product.countInStock ? "In Stock" : "Out Of Stock"}
                                             </Col>
                                         </Row>
                                     </ListGroupItem>
-                                    {product.countInStock > 0 && (
-                                        <ListGroupItem>
-                                            <Row>
-                                                <Col>Qty</Col>
-                                                <Col>
-                                                    <Form.Control as='select' value={qty} onChange={(e) => setQty(e.target.value)}>
-                                                        {[...Array(product.countInStock).keys()].map(x => (
-                                                            <option key={x + 1} value={x + 1}>{x + 1}</option>
-                                                        ))}
-                                                    </Form.Control>
-                                                </Col>
-                                            </Row>
-                                        </ListGroupItem>
-                                    )}
                                     <ListGroupItem>
                                         <Button
                                             className='btn-block'
                                             type='button'
-                                            disabled={product.countInStock === 0}
+                                            disabled={product.countInStock === false}
                                             onClick={addToCartHandler}
                                         >
                                             Add To Cart
