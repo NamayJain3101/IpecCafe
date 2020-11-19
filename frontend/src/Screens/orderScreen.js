@@ -11,7 +11,7 @@ import Message from '../Components/Message'
 import Loader from '../Components/Loader'
 import { useState } from 'react'
 import { ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
-import { updateUserDetails } from '../Actions/userActions'
+import { getUserDetails, updateUserDetails } from '../Actions/userActions'
 
 const OrderScreen = ({ match, history }) => {
 
@@ -56,6 +56,9 @@ const OrderScreen = ({ match, history }) => {
                 }
                 document.body.appendChild(script)
             }
+            if (!user.wallet) {
+                dispatch(getUserDetails('profile'))
+            }
             if (!order || (order._id !== orderId) || successPay || successDeliver) {
                 dispatch({ type: ORDER_PAY_RESET })
                 dispatch({ type: ORDER_DELIVER_RESET })
@@ -71,7 +74,7 @@ const OrderScreen = ({ match, history }) => {
             history.push('/login')
         }
 
-    }, [dispatch, orderId, successPay, order, successDeliver, userInfo, history])
+    }, [dispatch, orderId, successPay, order, successDeliver, userInfo, history, user])
 
     const successPaymentHandler = (paymentResult) => {
         dispatch(payOrder(orderId, paymentResult))

@@ -32,7 +32,7 @@ const PaymentScreen = ({ history }) => {
                             id='PayPal'
                             name='paymentMethod'
                             value='PayPal'
-                            checked onChange={(e) => setPaymentMethod(e.target.value)} >
+                            onChange={(e) => setPaymentMethod(e.target.value)} >
                         </FormCheck>
                         <FormCheck type='radio'
                             label='Cash'
