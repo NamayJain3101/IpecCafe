@@ -46,7 +46,7 @@ const WalletScreen = ({ history, match }) => {
                 }
                 document.body.appendChild(script)
             }
-            if (!user || (updatedUser && updatedUser.wallet !== user.wallet) || (user._id !== userId) || successPay) {
+            if (!user || (user._id !== userId) || successPay) {
                 dispatch({ type: USER_RECHARGE_WALLET_RESET })
                 dispatch(getUserDetails('profile'))
             } else {
