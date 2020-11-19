@@ -16,9 +16,8 @@ const ProductEditScreen = ({ match, history }) => {
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
     const [image, setImage] = useState('')
-    const [brand, setBrand] = useState('')
     const [category, setCategory] = useState('')
-    const [countInStock, setCountInStock] = useState(0)
+    const [countInStock, setCountInStock] = useState(false)
     const [description, setDescription] = useState('')
     const [uploading, setUploading] = useState(false)
 
@@ -43,7 +42,6 @@ const ProductEditScreen = ({ match, history }) => {
                 setName(product.name)
                 setPrice(product.price)
                 setImage(product.image)
-                setBrand(product.brand)
                 setCategory(product.category)
                 setCountInStock(product.countInStock)
                 setDescription(product.description)
@@ -74,12 +72,11 @@ const ProductEditScreen = ({ match, history }) => {
 
     const submitHandler = (e) => {
         e.preventDefault()
-        console.log(name, brand, price)
+        console.log(name, price)
         dispatch(updateProduct({
             _id: productId,
             name,
             price,
-            brand,
             image,
             category,
             description,
@@ -110,21 +107,16 @@ const ProductEditScreen = ({ match, history }) => {
                             <FormFile id='image-file' label='Choose File' custom onChange={uploadFileHandler} />
                             {uploading && <Loader />}
                         </FormGroup>
-                        <FormGroup controlId='brand'>
-                            <FormLabel>Brand: </FormLabel>
-                            <FormControl type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}></FormControl>
-                        </FormGroup>
                         <FormGroup controlId='category'>
                             <FormLabel>Category: </FormLabel>
                             <FormControl type='text' placeholder='Category' value={category} onChange={(e) => setCategory(e.target.value)}></FormControl>
                         </FormGroup>
                         <FormGroup controlId='countInStock'>
                             <FormLabel>Count In Stock: </FormLabel>
-                            <FormControl type='number' placeholder='Count In Stock' value={countInStock} onChange={(e) => setCountInStock(e.target.value)}></FormControl>
-                        </FormGroup>
-                        <FormGroup controlId='description'>
-                            <FormLabel>Description: </FormLabel>
-                            <FormControl type='text' placeholder='Description' value={description} onChange={(e) => setDescription(e.target.value)}></FormControl>
+                            <Form.Control as='select' value={countInStock} onChange={(e) => setCountInStock(e.target.value)}>
+                                <option value={true}>Available</option>
+                                <option value={false}>Not Available</option>
+                            </Form.Control>
                         </FormGroup>
                         <Button type='submit' variant='primary'>
                             Update

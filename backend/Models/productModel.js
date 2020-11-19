@@ -36,15 +36,7 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    brand: {
-        type: String,
-        required: true
-    },
     category: {
-        type: String,
-        required: true,
-    },
-    description: {
         type: String,
         required: true,
     },
@@ -65,9 +57,9 @@ const productSchema = mongoose.Schema({
         default: 0
     },
     countInStock: {
-        type: Number,
+        type: Boolean,
         required: true,
-        default: 0
+        default: true
     }
 }, {
     timestamps: true
