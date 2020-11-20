@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails, recharge } from '../Actions/userActions'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
-import { USER_RECHARGE_WALLET_RESET } from '../constants/userConstants'
+import { USER_RECHARGE_WALLET_RESET, USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
 import { PayPalButton } from 'react-paypal-button-v2'
 
 const WalletScreen = ({ history, match }) => {
@@ -21,7 +21,7 @@ const WalletScreen = ({ history, match }) => {
     const { user, loading, error } = userDetails
 
     const userUpdateProfile = useSelector(state => state.userUpdateProfile)
-    const { userInfo: updatedUser } = userUpdateProfile
+    const { success } = userUpdateProfile
 
     const rechargeWallet = useSelector(state => state.rechargeWallet)
     const { loading: loadingPay, success: successPay } = rechargeWallet
@@ -46,8 +46,9 @@ const WalletScreen = ({ history, match }) => {
                 }
                 document.body.appendChild(script)
             }
-            if (!user || (user._id !== userId) || successPay) {
+            if (!user || success || (user._id !== userId) || successPay) {
                 dispatch({ type: USER_RECHARGE_WALLET_RESET })
+                dispatch({ type: USER_UPDATE_PROFILE_RESET })
                 dispatch(getUserDetails('profile'))
             } else {
                 if (!window.paypal) {
@@ -60,7 +61,7 @@ const WalletScreen = ({ history, match }) => {
             history.push('/login')
         }
 
-    }, [dispatch, successPay, userInfo, history, user, userId, updatedUser])
+    }, [dispatch, successPay, userInfo, history, user, userId, success])
 
     const successPaymentHandler = (paymentResult) => {
         if (wallet) {
