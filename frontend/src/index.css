@@ -52,3 +52,56 @@ h3 {
         font-size: 2.5vw;
     }
 }
+
+.react-confirm-alert {
+    background: white;
+    box-shadow: 2px 2px 20px 2px black;
+    border-radius: 1rem !important;
+}
+
+.react-confirm-alert-body {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem !important;
+    background: white !important;
+    color: black !important;
+}
+
+.react-confirm-alert-body * {
+    text-align: center !important;
+    color: black !important;
+}
+
+.react-confirm-alert-body h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem;
+}
+
+.react-confirm-alert-body input {
+    border: 1px solid black;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.react-confirm-alert-button-group button:first-of-type {
+    background: var(--success) !important;
+    color: white !important;
+    margin: 0 1rem !important;
+}
+
+.react-confirm-alert-button-group button:last-of-type {
+    background: var(--danger) !important;
+    color: white !important;
+    margin: 0 1rem !important;
+}
+
+@media(max-width: 500px) {
+    .react-confirm-alert {
+        max-width: 320px;
+    }
+    .react-confirm-alert-body {
+        max-width: 320px;
+    }
+}

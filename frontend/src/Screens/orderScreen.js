@@ -12,12 +12,15 @@ import Loader from '../Components/Loader'
 import { useState } from 'react'
 import { ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
 import { getUserDetails, updateUserDetails } from '../Actions/userActions'
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const OrderScreen = ({ match, history }) => {
 
     const orderId = match.params.id
 
     const [sdkReady, setSdkReady] = useState(false)
+    const [message, setMessage] = useState('')
 
     const dispatch = useDispatch()
 
@@ -107,8 +110,29 @@ const OrderScreen = ({ match, history }) => {
         }))
     }
 
-    const deliverHandler = () => {
-        dispatch(deliverOrder(order))
+    const deliverHandler = (code) => {
+        confirmAlert({
+            title: `DELIVER ORDER`,
+            message: 'Enter Code',
+            childrenElement: () => <input type='number' name='delivery-code' id='delivery-code' />,
+            buttons: [
+                {
+                    label: 'Confirm',
+                    onClick: () => {
+                        if (document.getElementById('delivery-code').value.toString() === code.toString()) {
+                            dispatch(deliverOrder(order))
+                            setMessage('')
+                        } else {
+                            setMessage('Incorrect code')
+                        }
+                    }
+                },
+                {
+                    label: 'Cancel',
+                    onClick: () => { }
+                },
+            ],
+        })
     }
 
     return (
@@ -127,8 +151,11 @@ const OrderScreen = ({ match, history }) => {
                                         <strong>Email: </strong>
                                         <a href={`mailto: ${order.user.email}`}>{order.user.email}</a>
                                     </p>
+                                    {order.isPaid && !order.isDelivered && (
+                                        <Message variant='info'>Code: {order.deliveryCode}</Message>
+                                    )}
                                     {order.isDelivered
-                                        ? <Message variant='success'>Delivered on {order.deliveredAt}</Message>
+                                        ? <Message variant='success'>Delivered on {new Date(`${order.deliveredAt.toString()}`).toDateString()} {new Date(`${order.deliveredAt.toString()}`).toLocaleTimeString()}</Message>
                                         : <Message variant='danger'>Not Delivered</Message>
                                     }
                                 </ListGroupItem>
@@ -139,7 +166,7 @@ const OrderScreen = ({ match, history }) => {
                                         {order.paymentMethod}
                                     </p>
                                     {order.isPaid && order.paymentMethod !== 'Cash'
-                                        ? <Message variant='success'>Paid on {order.paidAt}</Message>
+                                        ? <Message variant='success'>Paid on {new Date(`${order.paidAt.toString()}`).toDateString()} {new Date(`${order.paidAt.toString()}`).toLocaleTimeString()}</Message>
                                         : (order.isPaid && order.paymentMethod === 'Cash')
                                             ? <Message variant='success'>Pay On Delivery</Message>
                                             : <Message variant='danger'>Not Paid</Message>
@@ -156,7 +183,7 @@ const OrderScreen = ({ match, history }) => {
                                                             <Col md={1}>
                                                                 <Image src={item.image} alt={item.name} fluid rounded />
                                                             </Col>
-                                                            <Col>
+                                                            <Col className='py-2 py-md-0'>
                                                                 <Link to={`/product/${item.product}`}>
                                                                     {item.name}
                                                                 </Link>
@@ -178,18 +205,6 @@ const OrderScreen = ({ match, history }) => {
                                 <ListGroup variant='flush'>
                                     <ListGroupItem>
                                         <h2>Order Summary</h2>
-                                    </ListGroupItem>
-                                    <ListGroupItem>
-                                        <Row>
-                                            <Col>Items</Col>
-                                            <Col>&#8377;{order.itemsPrice}</Col>
-                                        </Row>
-                                    </ListGroupItem>
-                                    <ListGroupItem>
-                                        <Row>
-                                            <Col>Tax</Col>
-                                            <Col>&#8377;{order.taxPrice}</Col>
-                                        </Row>
                                     </ListGroupItem>
                                     <ListGroupItem>
                                         <Row>
@@ -218,9 +233,14 @@ const OrderScreen = ({ match, history }) => {
                                     {loadingDeliver && <Loader />}
                                     {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                                         <ListGroupItem>
-                                            <Button type='button' className='btn btn-block' onClick={deliverHandler}>
+                                            <Button type='button' className='btn btn-block' onClick={(code) => deliverHandler(order.deliveryCode)}>
                                                 Mark as Delivered
-                                        </Button>
+                                            </Button>
+                                        </ListGroupItem>
+                                    )}
+                                    {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && message && (
+                                        <ListGroupItem>
+                                            <Message variant='danger'>{message}</Message>
                                         </ListGroupItem>
                                     )}
                                 </ListGroup>

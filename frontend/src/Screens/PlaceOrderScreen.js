@@ -10,6 +10,7 @@ import Loader from '../Components/Loader'
 import Message from '../Components/Message'
 import { ORDER_CREATE_RESET } from '../constants/orderConstants'
 import { USER_DETAILS_RESET } from '../constants/userConstants'
+import randtoken from 'rand-token'
 
 const PlaceOrderScreen = ({ history }) => {
     const cart = useSelector(state => state.cart)
@@ -19,8 +20,6 @@ const PlaceOrderScreen = ({ history }) => {
     }
 
     cart.itemsPrice = addDecimals(cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0))
-    cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)))
-    cart.totalPrice = addDecimals((Number(cart.itemsPrice) + Number(cart.taxPrice)).toFixed(2))
 
     const dispatch = useDispatch()
 
@@ -46,9 +45,8 @@ const PlaceOrderScreen = ({ history }) => {
             orderItems: cart.cartItems,
             shippingAddress: cart.shippingAddress,
             paymentMethod: cart.paymentMethod.paymentMethod,
-            itemsPrice: cart.itemsPrice,
-            taxPrice: cart.taxPrice,
-            totalPrice: cart.totalPrice
+            totalPrice: cart.itemsPrice,
+            deliveryCode: randtoken.generator({ chars: '0-9' }).generate(3),
         }))
     }
 
@@ -100,20 +98,8 @@ const PlaceOrderScreen = ({ history }) => {
                                 </ListGroupItem>
                                 <ListGroupItem>
                                     <Row>
-                                        <Col>Items</Col>
-                                        <Col>&#8377;{cart.itemsPrice}</Col>
-                                    </Row>
-                                </ListGroupItem>
-                                <ListGroupItem>
-                                    <Row>
-                                        <Col>Tax</Col>
-                                        <Col>&#8377;{cart.taxPrice}</Col>
-                                    </Row>
-                                </ListGroupItem>
-                                <ListGroupItem>
-                                    <Row>
                                         <Col>Total</Col>
-                                        <Col>&#8377;{cart.totalPrice}</Col>
+                                        <Col>&#8377;{cart.itemsPrice}</Col>
                                     </Row>
                                 </ListGroupItem>
                                 <ListGroupItem>

@@ -87,10 +87,24 @@ const ProductScreen = ({ match, history }) => {
                                         <Row>
                                             <Col>Status: </Col>
                                             <Col>
-                                                {product.countInStock ? "In Stock" : "Out Of Stock"}
+                                                {product.countInStock ? "Available" : "Not available"}
                                             </Col>
                                         </Row>
                                     </ListGroupItem>
+                                    {product.countInStock && (
+                                        <ListGroupItem>
+                                            <Row>
+                                                <Col>Qty</Col>
+                                                <Col>
+                                                    <Form.Control as='select' value={qty} onChange={(e) => setQty(e.target.value)}>
+                                                        {[...Array(10).keys()].map(x => (
+                                                            <option key={x + 1} value={x + 1}>{x + 1}</option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Col>
+                                            </Row>
+                                        </ListGroupItem>
+                                    )}
                                     <ListGroupItem>
                                         <Button
                                             className='btn-block'
