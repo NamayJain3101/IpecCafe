@@ -47,6 +47,8 @@ const PlaceOrderScreen = ({ history }) => {
             paymentMethod: cart.paymentMethod.paymentMethod,
             totalPrice: cart.itemsPrice,
             deliveryCode: randtoken.generator({ chars: '0-9' }).generate(3),
+            name: user.name,
+            email: user.email
         }))
     }
 

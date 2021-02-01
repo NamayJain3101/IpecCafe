@@ -10,17 +10,28 @@ const addOrderItems = asyncHandler(async(req, res) => {
         paymentMethod,
         totalPrice,
         deliveryCode,
+        name,
+        email
     } = req.body
     if (orderItems && orderItems.length === 0) {
         res.status(400)
         throw new Error('No Order Items')
     } else {
+        const currentDate = (new Date().getDate())
+        const prevDate = new Date
+        prevDate.setDate(prevDate.getDate() - 1)
+        const numTokens = await Order.find({ createdAt: { $gt: prevDate } }).countDocuments()
+        const tempToken = (currentDate * 10) + parseInt(numTokens)
+
         const order = new Order({
             orderItems,
             user: req.user._id,
             paymentMethod,
             totalPrice,
-            deliveryCode
+            deliveryCode,
+            name: name,
+            email: email,
+            token: tempToken
         })
         const createdOrder = await order.save()
         res.status(201).json(createdOrder)
@@ -79,7 +90,6 @@ const getOrders = asyncHandler(async(req, res) => {
 
     const count = await Order.countDocuments()
 
-
     const orders = await Order.find({}).populate('user', 'id name email').sort({ createdAt: -1 }).limit(pageSize).skip(pageSize * (page - 1))
     res.json({ orders, page, pages: Math.ceil(count / pageSize) })
 })
@@ -92,6 +102,7 @@ const updateOrderToDelivered = asyncHandler(async(req, res) => {
     if (order) {
         order.isDelivered = true
         order.deliveredAt = Date.now()
+        order.ready = false
 
         const updatedOrder = await order.save()
         res.json(updatedOrder)
@@ -101,4 +112,32 @@ const updateOrderToDelivered = asyncHandler(async(req, res) => {
     }
 })
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered }
+// @desc    Update order to ready
+// @route   GET /api/orders/:id/ready
+// @access  Private/Admin
+const updateOrderToReady = asyncHandler(async(req, res) => {
+    const order = await Order.findById(req.params.id)
+    if (order) {
+        order.ready = true
+        const updatedOrder = await order.save()
+        res.json(updatedOrder)
+    } else {
+        res.status(404)
+        throw new Error('Order not found')
+    }
+})
+
+// @desc    get ready orders
+// @route   GET /api/orders/ready
+// @access  Private/Admin
+const getReadyOrders = asyncHandler(async(req, res) => {
+    const orders = await Order.find({ ready: true })
+    if (orders && orders.length > 0) {
+        res.json(orders)
+    } else {
+        res.status(404)
+        throw new Error('No orders ready currently')
+    }
+})
+
+export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered, updateOrderToReady, getReadyOrders }

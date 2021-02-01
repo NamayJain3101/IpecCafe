@@ -18,6 +18,7 @@ import WalletScreen from './Screens/WalletScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import UserEditScreen from './Screens/UserEditScreen';
 import UserListScreen from './Screens/UserListScreen';
+import ReadyOrdersTokens from './Screens/ReadyOrdersTokens';
 
 const App = () => {
     return (
@@ -25,15 +26,15 @@ const App = () => {
             <Header />
             <main className='py-3'>
                 <Container>
-                    <Route path='/order/:id' component={OrderScreen} />
-                    <Route path='/placeorder' component={PlaceOrderScreen} />
-                    <Route path='/payment' component={PaymentScreen} />
-                    <Route path='/login' component={LoginScreen} />
-                    <Route path='/register' component={RegisterScreen} />
-                    <Route path='/profile' component={ProfileScreen} />
-                    <Route path='/wallet/:id' component={WalletScreen} />
-                    <Route path='/product/:id' component={ProductScreen} />
-                    <Route path='/cart/:id?' component={CartScreen} />
+                    <Route path='/order/:id' exact component={OrderScreen} />
+                    <Route path='/placeorder' exact component={PlaceOrderScreen} />
+                    <Route path='/payment' exact component={PaymentScreen} />
+                    <Route path='/login' exact component={LoginScreen} />
+                    <Route path='/register' exact component={RegisterScreen} />
+                    <Route path='/profile' exact component={ProfileScreen} />
+                    <Route path='/wallet/:id' exact component={WalletScreen} />
+                    <Route path='/product/:id' exact component={ProductScreen} />
+                    <Route path='/cart/:id?' exact component={CartScreen} />
                     <Route path='/admin/userlist' exact component={UserListScreen} />
                     <Route path='/admin/userlist/:pageNumber' exact component={UserListScreen} />
                     <Route path='/admin/user/:id/edit' component={UserEditScreen} />
@@ -41,6 +42,7 @@ const App = () => {
                     <Route path='/admin/productlist/:pageNumber' exact component={ProductListScreen} />
                     <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
                     <Route path='/admin/orderlist' exact component={OrderListScreen} />
+                    <Route path='/orders/ready' exact component={ReadyOrdersTokens} />
                     <Route path='/admin/orderlist/:pageNumber' exact component={OrderListScreen} />
                     <Route path='/search/:keyword' exact component={HomeScreen} />
                     <Route path='/search/:keyword/page/:pageNumber' component={HomeScreen} />

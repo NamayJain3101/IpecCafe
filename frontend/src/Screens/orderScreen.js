@@ -122,6 +122,7 @@ const OrderScreen = ({ match, history }) => {
                         if (document.getElementById('delivery-code').value.toString() === code.toString()) {
                             dispatch(deliverOrder(order))
                             setMessage('')
+                            window.open('/orders/ready', 'mainWindow')
                         } else {
                             setMessage('Incorrect code')
                         }
@@ -140,6 +141,11 @@ const OrderScreen = ({ match, history }) => {
             <React.Fragment>
                 {userInfo && userInfo.isAdmin && <Link to='/admin/orderlist' className='btn btn-light my-3'>Go Back</Link>}
                 <h1>Order {order._id}</h1>
+                {userInfo && order && !order.isDelivered && (
+                    <h3>
+                        Token: {order.token}
+                    </h3>
+                )}
                 {loadingUser ? <Loader /> : errorUser ? <Message variant='danger'>{error}</Message> : (
                     <Row>
                         <Col md={8}>
@@ -151,7 +157,7 @@ const OrderScreen = ({ match, history }) => {
                                         <strong>Email: </strong>
                                         <a href={`mailto: ${order.user.email}`}>{order.user.email}</a>
                                     </p>
-                                    {order.isPaid && !order.isDelivered && (
+                                    {userInfo && userInfo.email === order.user.email && order.isPaid && !order.isDelivered && (
                                         <Message variant='info'>Code: {order.deliveryCode}</Message>
                                     )}
                                     {order.isDelivered

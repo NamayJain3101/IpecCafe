@@ -63,6 +63,23 @@ const orderSchema = mongoose.Schema({
     deliveryCode: {
         type: String,
         required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+    },
+    token: {
+        type: Number,
+        required: true,
+    },
+    ready: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 }, {
     timestamps: true
