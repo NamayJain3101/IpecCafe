@@ -59,7 +59,7 @@ const OrderScreen = ({ match, history }) => {
                 }
                 document.body.appendChild(script)
             }
-            if (!user.wallet) {
+            if (!user.name) {
                 dispatch(getUserDetails('profile'))
             }
             if (!order || (order._id !== orderId) || successPay || successDeliver) {
