@@ -28,6 +28,19 @@ const authUser = asyncHandler(async(req, res) => {
 // @access  Public
 const registerUser = asyncHandler(async(req, res) => {
     const { name, email, password } = req.body
+
+    const regExpName = /\s*([A-Za-z]+([\.,] |[-']| )?)[A-Za-z]*\s*$/g
+    if (!regExpName.test(name)) {
+        res.status(400)
+        throw new Error('Invalid Name syntax')
+    }
+
+    const regExpPassword = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*?>< ])[a-zA-Z0-9!@#$%^&*?>< ]{8,15}$/
+    if (!regExpPassword.test(password)) {
+        res.status(400)
+        throw new Error('Password must contain at least 1 digit, 1 special character, 1 character and length between 8-15')
+    }
+
     const userExists = await User.findOne({ email })
     if (userExists) {
         res.status(400)
@@ -78,6 +91,23 @@ const getUserProfile = asyncHandler(async(req, res) => {
 const updateUserProfile = asyncHandler(async(req, res) => {
     const user = await User.findById(req.user._id)
     if (user) {
+
+        if (req.body.name) {
+            const regExpName = /\s*([A-Za-z]+([\.,] |[-']| )?)[A-Za-z]*\s*$/g
+            if (!regExpName.test(req.body.name)) {
+                res.status(400)
+                throw new Error('Invalid Name syntax')
+            }
+        }
+
+        if (req.body.password) {
+            const regExpPassword = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*?>< ])[a-zA-Z0-9!@#$%^&*?>< ]{8,15}$/
+            if (!regExpPassword.test(req.body.password)) {
+                res.status(400)
+                throw new Error('Password must contain at least 1 digit, 1 special character, 1 character and length between 8-15')
+            }
+        }
+
         user.name = req.body.name || user.name
         user.email = req.body.email || user.email
         user.wallet = req.body.wallet || user.wallet
@@ -167,6 +197,23 @@ const getUserById = asyncHandler(async(req, res) => {
 const updateUser = asyncHandler(async(req, res) => {
     const user = await User.findById(req.params.id)
     if (user) {
+
+        if (req.body.name) {
+            const regExpName = /\s*([A-Za-z]+([\.,] |[-']| )?)[A-Za-z]*\s*$/g
+            if (!regExpName.test(req.body.name)) {
+                res.status(400)
+                throw new Error('Invalid Name syntax')
+            }
+        }
+
+        if (req.body.password) {
+            const regExpPassword = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*?>< ])[a-zA-Z0-9!@#$%^&*?>< ]{8,15}$/
+            if (!regExpPassword.test(req.body.password)) {
+                res.status(400)
+                throw new Error('Password must contain at least 1 digit, 1 special character, 1 character and length between 8-15')
+            }
+        }
+
         user.name = req.body.name || user.name
         user.email = req.body.email || user.email
         user.wallet = req.body.wallet || user.wallet
