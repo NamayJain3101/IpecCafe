@@ -120,8 +120,6 @@ const OrderScreen = ({ match, history }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, orderId, successPay, order, successDeliver, userInfo, history, user, successCoupon])
 
-    console.log(discount)
-
     const successPaymentHandler = (paymentResult) => {
         dispatch(payOrder(orderId, paymentResult, { discount: discount }))
     }
