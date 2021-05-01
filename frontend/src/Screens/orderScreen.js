@@ -10,13 +10,12 @@ import { deliverOrder, getOrderDetails, payOrder } from '../Actions/orderActions
 import Message from '../Components/Message'
 import Loader from '../Components/Loader'
 import { useState } from 'react'
-import { ORDER_CREATE_RESET, ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
+import { ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
 import { getUserDetails, updateUserDetails } from '../Actions/userActions'
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import { clearCart } from '../Actions/cartActions'
 import { COUPON_GET_RESET, COUPON_UPDATE_RESET } from '../constants/couponConstants'
-import { USER_DETAILS_RESET } from '../constants/userConstants'
 import { getCoupon, updateCoupon } from '../Actions/couponActions'
 import styled from 'styled-components'
 
@@ -28,9 +27,6 @@ const OrderScreen = ({ match, history }) => {
     const [message, setMessage] = useState('')
 
     const dispatch = useDispatch()
-
-    const cart = useSelector(state => state.cart)
-    const { shippingAddress, paymentMethod, cartItems } = cart
 
     const addDecimals = (num) => {
         return (Math.round(num * 100) / 100).toFixed(2)

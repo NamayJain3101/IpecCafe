@@ -143,7 +143,7 @@ const WalletScreen = ({ history, match }) => {
             </Col>
             <Col md={8}>
                 <h1 className='mb-5'>Available Coupons</h1>
-                {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
+                {loadingCoupons ? <Loader /> : errorCoupons ? <Message variant='danger'>{errorCoupons}</Message> : (
                     <React.Fragment>
                         <CouponWrapper>
                             {coupons && coupons.map(coupon => {

@@ -2,12 +2,10 @@ import React, { useEffect } from 'react'
 import { Button, Col, Row } from 'react-bootstrap'
 import { FaPlus } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { listCoupons, deleteCoupon, createCoupon } from '../Actions/couponActions'
+import { listCoupons, deleteCoupon } from '../Actions/couponActions'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
-import Paginate from '../Components/Paginate'
 
 const CouponListScreen = ({ history }) => {
 
@@ -52,7 +50,7 @@ const CouponListScreen = ({ history }) => {
                     </Button>
                 </Col>
             </Row>
-            {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
+            {loading || loadingDelete ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : errorDelete ? <Message variant='danger'>{errorDelete}</Message> : (
                 <React.Fragment>
                     <CouponWrapper>
                         {coupons.map(coupon => {
