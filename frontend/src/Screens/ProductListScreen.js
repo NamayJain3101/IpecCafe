@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react'
-import { LinkContainer } from 'react-router-bootstrap'
-import { FaEdit, FaPlus, FaTrash } from 'react-icons/fa'
+import { FaPlus, FaTimes } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
-import { Button, Col, Row, Table } from 'react-bootstrap'
+import { Button, Col, Row } from 'react-bootstrap'
 import { createProduct, deleteProduct, listProducts } from '../Actions/ProductActions'
 import { PRODUCT_CREATE_RESET } from '../constants/productConstants'
 import Paginate from '../Components/Paginate'
+import styled from 'styled-components'
+import { TiTick } from 'react-icons/ti'
+import { Link } from 'react-router-dom'
 
 const ProductListScreen = ({ history, match }) => {
     const dispatch = useDispatch()
@@ -68,44 +70,103 @@ const ProductListScreen = ({ history, match }) => {
             {errorCreate && <Message variant='danger'>{errorCreate}</Message>}
             {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
                 <React.Fragment>
-                    <Table striped bordered hover responsive className='table-sm'>
-                        <thead>
-                            <tr>
-                                <td>ID</td>
-                                <td>NAME</td>
-                                <td>PRICE</td>
-                                <td>CATEGORY</td>
-                                <td>AVAILABLE</td>
-                                <td></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map(product => {
-                                return (
-                                    <tr key={product._id}>
-                                        <td>{product._id}</td>
-                                        <td>{product.name}</td>
-                                        <td>&#8377;{product.price}</td>
-                                        <td>{product.category}</td>
-                                        <td>{product.countInStock ? 'Available' : 'Not Available'}</td>
-                                        <td>
-                                            <LinkContainer to={`/admin/product/${product._id}/edit`}>
-                                                <Button variant='primary' className='btn-sm'><FaEdit /></Button>
-                                            </LinkContainer>
-                                            <Button variant='danger' className='btn-sm' onClick={() => deleteHandler(product._id)}>
-                                                <FaTrash />
+                    <ProductWrapper>
+                        {products.map(product => {
+                            return (
+                                <div key={product._id} className='product'>
+                                    <div className='id py-2 px-3 bg-dark text-light'>{product._id}</div>
+                                    <div className='productproducts'>
+                                        <div>
+                                            <img src={product.image} alt={product.name} className='img-fluid' />
+                                        </div>
+                                    </div>
+                                    <div className='price mb-3'>Name: {product.name}</div>
+                                    <div className='price mb-3'>Price: <span>&#8377;{product.price}</span></div>
+                                    <div className='price mb-3'>Category: {product.category}</div>
+                                    <div className='available row mb-3'>
+                                        <Col>
+                                            Available: {product.countInStock ? <TiTick fontSize='1.5rem' color='green' /> : <FaTimes fontSize='1.5rem' color='red' />}
+                                        </Col>
+                                    </div>
+                                    <ButtonContainerWrapper>
+                                        <Link to={`/admin/product/${product._id}/edit`}>
+                                            <Button
+                                                variant='info'
+                                                style={{
+                                                    fontSize: '1.2rem',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '2px',
+                                                    marginRight: '1rem'
+                                                }}
+                                            >
+                                                Edit Product
                                             </Button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </Table>
+                                        </Link>
+                                        <Button
+                                            variant='danger'
+                                            style={{
+                                                fontSize: '1.2rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '2px',
+                                                marginRight: '1rem'
+                                            }}
+                                            onClick={() => deleteHandler(product._id)}
+                                        >
+                                            Delete Product
+                                        </Button>
+                                    </ButtonContainerWrapper>
+                                </div>
+                            )
+                        })}
+                    </ProductWrapper>
                     <Paginate pages={pages} page={page} isAdmin={true} url='/admin/productlist' />
                 </React.Fragment>
             )}
         </React.Fragment>
     )
 }
+
+const ProductWrapper = styled.div`
+    .product {
+        margin-bottom: 2rem;
+    }
+    .productproducts {
+        margin: 1rem auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        grid-row-gap: 1rem;
+        grid-column-gap: 1rem;
+    }
+    .productproducts > div {
+        position: relative;
+        border: 1px solid black;
+        overflow: hidden;
+    }
+    .price, .id {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+    .price > span {
+        font-family: sans-serif;
+        font-weight: bold;
+    }
+    .available {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+`
+
+const ButtonContainerWrapper = styled.div`
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 4rem;
+    button {
+        border-radius: 0
+    }
+`
 
 export default ProductListScreen

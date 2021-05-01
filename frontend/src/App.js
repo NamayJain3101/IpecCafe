@@ -19,6 +19,8 @@ import RegisterScreen from './Screens/RegisterScreen';
 import UserEditScreen from './Screens/UserEditScreen';
 import UserListScreen from './Screens/UserListScreen';
 import ReadyOrdersTokens from './Screens/ReadyOrdersTokens';
+import CouponListScreen from './Screens/CouponListScreen';
+import CouponCreateScreen from './Screens/CouponCreateScreen';
 
 const App = () => {
     return (
@@ -44,6 +46,8 @@ const App = () => {
                     <Route path='/admin/orderlist' exact component={OrderListScreen} />
                     <Route path='/orders/ready' exact component={ReadyOrdersTokens} />
                     <Route path='/admin/orderlist/:pageNumber' exact component={OrderListScreen} />
+                    <Route path='/admin/couponlist' exact component={CouponListScreen} />
+                    <Route path='/admin/couponlist/create' exact component={CouponCreateScreen} />
                     <Route path='/search/:keyword' exact component={HomeScreen} />
                     <Route path='/search/:keyword/page/:pageNumber' component={HomeScreen} />
                     <Route path='/page/:pageNumber' exact component={HomeScreen} />

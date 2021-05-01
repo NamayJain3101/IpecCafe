@@ -27,18 +27,19 @@ const PaymentScreen = ({ history }) => {
                 <FormGroup>
                     <FormLabel as='legend' > Select Method </FormLabel>
                     <Col>
-                        <FormCheck type='radio'
+                        {/*<FormCheck type='radio'
                             label='PayPal or Credit Cart'
                             id='PayPal'
                             name='paymentMethod'
                             value='PayPal'
                             onChange={(e) => setPaymentMethod(e.target.value)} >
-                        </FormCheck>
+                        </FormCheck>*/}
                         <FormCheck type='radio'
                             label='Cash'
                             id='Cash'
                             name='paymentMethod'
                             value='Cash'
+                            defaultChecked={true}
                             onChange={(e) => setPaymentMethod(e.target.value)} >
                         </FormCheck>
                         <FormCheck type='radio'

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
-import { LinkContainer } from 'react-router-bootstrap'
-import { FaCheck, FaEdit, FaTimes, FaTrash } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteUser, listUsers } from '../Actions/userActions'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
-import { Button, Table } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import Paginate from '../Components/Paginate'
+import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 const UserListScreen = ({ history, match }) => {
     const pageNumber = match.params.pageNumber
@@ -41,44 +41,70 @@ const UserListScreen = ({ history, match }) => {
             <h1>Users</h1>
             {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
                 <React.Fragment>
-                    <Table striped bordered hover responsive className='table-sm'>
-                        <thead>
-                            <tr>
-                                <td>ID</td>
-                                <td>NAME</td>
-                                <td>EMAIL</td>
-                                <td>WALLET</td>
-                                <td>ADMIN</td>
-                                <td></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map(user => {
-                                return (
-                                    <tr key={user._id}>
-                                        <td>{user._id}</td>
-                                        <td>{user.name}</td>
-                                        <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
-                                        <td>&#8377;{user.wallet}</td>
-                                        <td>{user.isAdmin ? <FaCheck style={{ color: 'green' }} /> : <FaTimes style={{ color: 'red' }} />}</td>
-                                        <td>
-                                            <LinkContainer to={`/admin/user/${user._id}/edit`}>
-                                                <Button variant='primary' className='btn-sm'><FaEdit /></Button>
-                                            </LinkContainer>
-                                            <Button variant='danger' className='btn-sm' onClick={() => deleteHandler(user._id)}>
-                                                <FaTrash />
+                    <UserWrapper>
+                        {users.map(user => {
+                            return (
+                                <div key={user._id} className='user'>
+                                    <div className='id py-2 px-3 mb-3 bg-dark text-light'>{user._id}</div>
+                                    <div className='mb-3 price'>Name: {user.name}</div>
+                                    <div className='mb-3 price'>Email: <a href={`mailto:${user.email}`}>{user.email}</a></div>
+                                    <div className='mb-3 price'>Wallet: &#8377;{user.wallet}</div>
+                                    <ButtonContainerWrapper>
+                                        <Link to={`/admin/user/${user._id}/edit`}>
+                                            <Button
+                                                variant='info'
+                                                style={{
+                                                    fontSize: '1.2rem',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '2px',
+                                                    marginRight: '1rem'
+                                                }}
+                                            >
+                                                Edit user
                                             </Button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </Table>
+                                        </Link>
+                                        <Button
+                                            variant='danger'
+                                            style={{
+                                                fontSize: '1.2rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '2px',
+                                                marginRight: '1rem'
+                                            }}
+                                            onClick={() => deleteHandler(user._id)}
+                                        >
+                                            Delete User
+                                        </Button>
+                                    </ButtonContainerWrapper>
+                                </div>
+                            )
+                        })}
+                    </UserWrapper>
                     <Paginate pages={pages} page={page} isAdmin={true} url='/admin/userlist' />
                 </React.Fragment>
             )}
         </React.Fragment>
     )
 }
+
+const UserWrapper = styled.div`
+    .user {
+        margin-bottom: 2rem;
+    }
+    .price, .id {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+`
+
+const ButtonContainerWrapper = styled.div`
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 4rem;
+    button {
+        border-radius: 0
+    }
+`
 
 export default UserListScreen

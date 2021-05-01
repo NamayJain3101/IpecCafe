@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express from 'express'
 import { authUser, deleteUser, getUserById, getUserProfile, getUsers, rechargeWallet, registerUser, updateUser, updateUserProfile } from '../Controllers/userController.js';
 import { admin, protect } from '../middlewares/authMiddleware.js';
 const router = express.Router();

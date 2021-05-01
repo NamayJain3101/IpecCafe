@@ -10,10 +10,15 @@ import { deliverOrder, getOrderDetails, payOrder } from '../Actions/orderActions
 import Message from '../Components/Message'
 import Loader from '../Components/Loader'
 import { useState } from 'react'
-import { ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
+import { ORDER_CREATE_RESET, ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
 import { getUserDetails, updateUserDetails } from '../Actions/userActions'
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
+import { clearCart } from '../Actions/cartActions'
+import { COUPON_GET_RESET, COUPON_UPDATE_RESET } from '../constants/couponConstants'
+import { USER_DETAILS_RESET } from '../constants/userConstants'
+import { getCoupon, updateCoupon } from '../Actions/couponActions'
+import styled from 'styled-components'
 
 const OrderScreen = ({ match, history }) => {
 
@@ -23,6 +28,13 @@ const OrderScreen = ({ match, history }) => {
     const [message, setMessage] = useState('')
 
     const dispatch = useDispatch()
+
+    const cart = useSelector(state => state.cart)
+    const { shippingAddress, paymentMethod, cartItems } = cart
+
+    const addDecimals = (num) => {
+        return (Math.round(num * 100) / 100).toFixed(2)
+    }
 
     const orderDetails = useSelector(state => state.orderDetails)
     const { order, loading, error } = orderDetails
@@ -38,6 +50,16 @@ const OrderScreen = ({ match, history }) => {
 
     const userDetails = useSelector((state) => state.userDetails)
     const { loading: loadingUser, error: errorUser, user } = userDetails
+
+    const couponGet = useSelector((state) => state.couponGet)
+    const { success: successCoupon, loading: loadingCoupon, error: errorCoupon, coupon } = couponGet
+
+    const couponUpdate = useSelector((state) => state.couponUpdate)
+    const { success: successCouponUpdate } = couponUpdate
+
+    const [couponCode, setCouponCode] = useState('')
+    const [discount, setDiscount] = useState(0)
+    const [payAmount, setPayAmount] = useState('')
 
     if (!loading) {
         const addDecimals = (num) => {
@@ -76,11 +98,43 @@ const OrderScreen = ({ match, history }) => {
         } else {
             history.push('/login')
         }
+        if (order) {
+            setPayAmount(order.totalPrice)
+        }
+        if (!couponCode) {
+            dispatch({
+                type: COUPON_GET_RESET
+            })
+        }
+        if (successCoupon) {
+            if (coupon.discountType === 'flat') {
+                setDiscount(Number(coupon.discountAmount).toFixed(2))
+                setPayAmount(Number(order.totalPrice - coupon.discountAmount).toFixed(2))
+            } else {
+                const discount = (addDecimals(Number(((coupon.discountAmount / 100) * order.itemsPrice).toFixed(2)))) > coupon.discountUpto ? coupon.discountUpto : (addDecimals(Number(((coupon.discountAmount / 100) * order.itemsPrice).toFixed(2))))
+                setDiscount(Number(discount).toFixed(2))
+                setPayAmount(Number(order.totalPrice - discount).toFixed(2))
+            }
+        }
+        if (successCouponUpdate) {
+            dispatch({
+                type: COUPON_UPDATE_RESET
+            })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, orderId, successPay, order, successDeliver, userInfo, history, user, successCoupon])
 
-    }, [dispatch, orderId, successPay, order, successDeliver, userInfo, history, user])
+    console.log(discount)
 
     const successPaymentHandler = (paymentResult) => {
-        dispatch(payOrder(orderId, paymentResult))
+        dispatch(payOrder(orderId, paymentResult, { discount: discount }))
+    }
+
+    const applyCouponHandler = () => {
+        dispatch({
+            type: COUPON_GET_RESET
+        })
+        dispatch(getCoupon(couponCode, order.totalPrice))
     }
 
     const codPaymentHandler = () => {
@@ -91,7 +145,11 @@ const OrderScreen = ({ match, history }) => {
                 email_address: userInfo.email
             },
             update_time: Date.now()
-        }))
+        }, { discount: discount }))
+        if (coupon && coupon.code) {
+            dispatch(updateCoupon(coupon.code))
+        }
+        dispatch(clearCart())
     }
 
     const walletPaymentHandler = () => {
@@ -102,12 +160,21 @@ const OrderScreen = ({ match, history }) => {
                 email_address: userInfo.email
             },
             update_time: Date.now()
-        }))
-        const wallet = user.wallet - order.totalPrice
+        }, { discount: discount }))
+        // const wallet = user.wallet - order.totalPrice
+        // dispatch(updateUserDetails({
+        //     id: user._id,
+        //     wallet: wallet.toFixed(2)
+        // }))
+        const amount = Number(user.wallet) - Number(payAmount)
         dispatch(updateUserDetails({
             id: user._id,
-            wallet: wallet.toFixed(2)
+            wallet: amount.toFixed(2)
         }))
+        if (coupon && coupon.code) {
+            dispatch(updateCoupon(coupon.code))
+        }
+        dispatch(clearCart())
     }
 
     const deliverHandler = (code) => {
@@ -140,7 +207,7 @@ const OrderScreen = ({ match, history }) => {
         loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
             <React.Fragment>
                 {userInfo && userInfo.isAdmin && <Link to='/admin/orderlist' className='btn btn-light my-3'>Go Back</Link>}
-                <h1>Order {order._id}</h1>
+                <h1 style={{ overflow: 'auto' }}>Order {order._id}</h1>
                 {userInfo && order && !order.isDelivered && (
                     <h3>
                         Token: {order.token}
@@ -208,6 +275,28 @@ const OrderScreen = ({ match, history }) => {
                         </Col>
                         <Col md={4}>
                             <Card>
+                                {!order.isPaid && (
+                                    <div className="px-2 py-4 px-lg-3 px-xl-4 mt-4">
+                                        {loadingCoupon ? <Loader /> : (
+                                            <React.Fragment>
+                                                <div className='title mt-2 mb-3'>
+                                                    <h5 className='font-weight-bold text-capitalize'>
+                                                        {'Apply Coupon'.toUpperCase()}
+                                                    </h5>
+                                                </div>
+                                                <CouponsWrapper>
+                                                    <div className='mb-2'>
+                                                        <input style={{ border: '1px solid black' }} className='w-100 py-2 px-2' type="text" name="coupon" id="coupon" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} />
+                                                        <Button variant='success' className='py-2 px-3' style={{ borderRadius: '0', border: '0', height: '42.4px' }} disabled={couponCode.length === 0} onClick={applyCouponHandler}>APPLY</Button>
+                                                    </div>
+                                                </CouponsWrapper>
+                                                {errorCoupon && <p className='text-danger mt-2 text-center text-capitalize error'>{errorCoupon}</p>}
+                                            </React.Fragment>
+                                        )}
+                                    </div>
+                                )}
+                            </Card>
+                            <Card>
                                 <ListGroup variant='flush'>
                                     <ListGroupItem>
                                         <h2>Order Summary</h2>
@@ -216,6 +305,10 @@ const OrderScreen = ({ match, history }) => {
                                         <Row>
                                             <Col>Total</Col>
                                             <Col>&#8377;{order.totalPrice}</Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>Payable Amount</Col>
+                                            <Col>&#8377;{payAmount}</Col>
                                         </Row>
                                     </ListGroupItem>
                                     {!order.isPaid && (order.paymentMethod === 'PayPal') && (
@@ -258,5 +351,21 @@ const OrderScreen = ({ match, history }) => {
         )
     )
 }
+
+const CouponsWrapper = styled.div`
+    div{
+        display: flex;
+        align-items: center;
+        justify-content: center
+    }
+    @media(min-width: 768px) and (max-width: 1200px){
+        div{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center
+        }
+    }
+`
 
 export default OrderScreen

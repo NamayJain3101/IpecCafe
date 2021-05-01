@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express from 'express'
 import { createProduct, createProductReview, deleteProduct, getProductById, getProducts, getTopProducts, updateProduct } from '../Controllers/productController.js';
 import { protect, admin } from '../middlewares/authMiddleware.js'
 const router = express.Router();

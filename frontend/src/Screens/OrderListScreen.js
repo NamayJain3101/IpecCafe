@@ -41,6 +41,8 @@ const OrderListScreen = ({ history, match }) => {
         dispatch(markOrderAsReady(order))
     }
 
+    console.log(orders)
+
     return (
         <React.Fragment>
             <h1>Orders</h1>
@@ -50,7 +52,20 @@ const OrderListScreen = ({ history, match }) => {
                         {orders.map(order => {
                             return (
                                 <div key={order._id} className='order'>
-                                    <div className='id py-2 px-3 bg-danger text-light'>{order._id}</div>
+                                    <div className='id py-2 px-3 mb-3 bg-dark text-light'>{order._id}</div>
+                                    <ButtonContainerWrapper style={{ marginBottom: '0' }}>
+                                        <Button
+                                            variant='danger'
+                                            style={{
+                                                fontSize: '1.2rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '2px',
+                                                marginRight: '1rem'
+                                            }}
+                                        >
+                                            Token No: {order.token}
+                                        </Button>
+                                    </ButtonContainerWrapper>
                                     <div className='orderItems'>
                                         {order.orderItems.map(item => {
                                             return (
@@ -100,6 +115,7 @@ const OrderListScreen = ({ history, match }) => {
                                                         textTransform: 'uppercase',
                                                         letterSpacing: '2px',
                                                     }}
+                                                    disabled={order.ready}
                                                     onClick={(o) => readyOrderHandler(order)}
                                                 >
                                                     Mark as ready

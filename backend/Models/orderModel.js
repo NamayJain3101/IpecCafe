@@ -80,7 +80,17 @@ const orderSchema = mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
-    }
+    },
+    couponDiscount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    payAmount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
 }, {
     timestamps: true
 })
