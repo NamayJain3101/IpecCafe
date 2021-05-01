@@ -8,8 +8,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails, recharge } from '../Actions/userActions'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
+import { listMyCoupons } from '../Actions/couponActions'
 import { USER_RECHARGE_WALLET_RESET, USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
 import { PayPalButton } from 'react-paypal-button-v2'
+import styled from 'styled-components'
 
 const WalletScreen = ({ history, match }) => {
     const userId = match.params.id
@@ -25,6 +27,9 @@ const WalletScreen = ({ history, match }) => {
 
     const rechargeWallet = useSelector(state => state.rechargeWallet)
     const { loading: loadingPay, success: successPay } = rechargeWallet
+
+    const couponListMy = useSelector(state => state.couponListMy)
+    const { coupons, loading: loadingCoupons, error: errorCoupons } = couponListMy
 
     const [wallet, setWallet] = useState(0)
     const [sdkReady, setSdkReady] = useState(false)
@@ -57,6 +62,7 @@ const WalletScreen = ({ history, match }) => {
                     setSdkReady(true)
                 }
             }
+            dispatch(listMyCoupons())
         } else {
             history.push('/login')
         }
@@ -135,8 +141,42 @@ const WalletScreen = ({ history, match }) => {
                     </ListGroup>
                 )}
             </Col>
+            <Col md={8}>
+                <h1 className='mb-5'>Available Coupons</h1>
+                {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
+                    <React.Fragment>
+                        <CouponWrapper>
+                            {coupons && coupons.map(coupon => {
+                                return (
+                                    <div key={coupon._id} className='coupon'>
+                                        <div className='id py-2 px-3 mb-3 bg-dark text-light'>{coupon._id}</div>
+                                        <Button variant='success' style={{ borderRadius: '0' }} className='mb-3 price'>Code: {coupon.code}</Button>
+                                        <div className='mb-3 price'>Discount Type: <span className="text-uppercase">{coupon.discountType}</span></div>
+                                        {coupon.discountType.toLowerCase() === 'flat' ? (
+                                            <div className='mb-3 price'>Discount: &#8377;{coupon.discountAmount}</div>
+                                        ) : (
+                                            <div className='mb-3 price'>Discount: {coupon.discountAmount}% upto &#8377;{coupon.discountUpto}</div>
+                                        )}
+                                        <div className='mb-3 price'>Min amount required: &#8377;{coupon.minAmountRequired}</div>
+                                    </div>
+                                )
+                            })}
+                        </CouponWrapper>
+                    </React.Fragment>
+                )}
+            </Col>
         </Row>
     )
 }
+
+const CouponWrapper = styled.div`
+    .coupon {
+        margin-bottom: 2rem;
+    }
+    .price, .id {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+`
 
 export default WalletScreen

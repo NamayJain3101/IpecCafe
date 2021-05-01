@@ -68,7 +68,7 @@ const CouponCreateScreen = ({ history }) => {
                     <Form onSubmit={createCouponHandler}>
                         <FormGroup controlId='code'>
                             <FormLabel>Code: </FormLabel>
-                            <FormControl type='name' placeholder='Code' value={code} onChange={(e) => setCode(e.target.value)}></FormControl>
+                            <FormControl type='name' placeholder='Code' value={code} onChange={(e) => setCode(e.target.value.toUpperCase())}></FormControl>
                         </FormGroup>
                         <div className='mb-3 d-flex align-items-center justify-content-center'>
                             <label htmlFor='toggleDiscountType' className='m-0 mx-3'>{'flat'.toUpperCase()}</label>
