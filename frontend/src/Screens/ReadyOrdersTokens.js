@@ -30,17 +30,17 @@ const ReadyOrdersTokens = ({ history }) => {
                     <h1 className='m-3 text-uppercase text-center' style={{ letterSpacing: '4px' }}>{error}</h1>
                 </Message>
             ) : (
-                    <ReadyOrdersTokensWrappers>
-                        {orders.map((order, index) => {
-                            return (
-                                <h1
-                                    key={order._id}
-                                    style={index % 2 === 0 ? { background: 'cyan' } : { background: 'lime' }}
-                                >{order.token}</h1>
-                            )
-                        })}
-                    </ReadyOrdersTokensWrappers>
-                )}
+                <ReadyOrdersTokensWrappers>
+                    {orders.map((order, index) => {
+                        return (
+                            <h1
+                                key={order._id}
+                                style={index % 2 === 0 ? { background: 'cyan' } : { background: 'lime' }}
+                            >{order.token}</h1>
+                        )
+                    })}
+                </ReadyOrdersTokensWrappers>
+            )}
         </div>
     )
 }

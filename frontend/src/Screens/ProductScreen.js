@@ -113,7 +113,7 @@ const ProductScreen = ({ match, history }) => {
                                             onClick={addToCartHandler}
                                         >
                                             Add To Cart
-                                    </Button>
+                                        </Button>
                                     </ListGroupItem>
                                 </ListGroup>
                             </Card>

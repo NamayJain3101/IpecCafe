@@ -1,26 +1,147 @@
 import asyncHandler from 'express-async-handler'
 import User from '../Models/userModel.js'
 import generateToken from '../utils/generateToken.js'
+import nodemailer from 'nodemailer'
+import sendgridTransport from 'nodemailer-sendgrid-transport'
 
 // @desc    Auth User & get token
 // @route   POST /api/users/login
 // @access  Public
 const authUser = asyncHandler(async(req, res) => {
     const { email, password } = req.body
+    console.log(email, password)
     const user = await User.findOne({ email })
-    if (user && (await user.matchPassword(password))) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            wallet: user.wallet,
-            token: generateToken(user._id)
-        })
+    console.log(user)
+    if (password !== 'otp') {
+        if (user && (await user.matchPassword(password))) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                wallet: user.wallet,
+                token: generateToken(user._id)
+            })
+        } else {
+            res.status(401)
+            throw new Error('Invalid email or password')
+        }
     } else {
-        res.status(401)
-        throw new Error('Invalid email or password')
+        if (user) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                wallet: user.wallet,
+                token: generateToken(user._id)
+            })
+        } else {
+            res.status(401)
+            throw new Error('Invalid email or password')
+        }
     }
+})
+
+// @desc    Send OTP
+// @route   POST /api/users/otp
+// @access  Public
+const getOtp = asyncHandler(async(req, res) => {
+    const { email } = req.body
+    const user = await User.findOne({ email: email })
+    if (!user) {
+        res.status(404)
+        throw new Error("User not found")
+    } else {
+        var otp = Math.floor(100000 + Math.random() * 900000)
+        const options = {
+            auth: {
+                api_key: process.env.SENDGRID_API_KEY
+            }
+        }
+        const transporter = nodemailer.createTransport(sendgridTransport(options))
+        var mailOptions = {
+            from: 'namayjain.jainnamay@gmail.com',
+            to: email,
+            subject: "Your OTP is: ",
+            html: "<h3>Your OTP is </h3>" + "<h1 style='font-weight:bold;'>" + otp + "</h1>"
+        }
+        transporter.sendMail(mailOptions, async(error, info) => {
+            if (error) {
+                console.log(error)
+                throw new Error('Error sending OTP')
+            }
+            user.otp = otp
+            user.expireOtp = Date.now() + 3600000
+            const updatedUser = await user.save()
+            if (updatedUser) {
+                res.json({
+                    otpSent: true,
+                    email: req.body.email
+                })
+            } else {
+                throw new Error('Error sending OTP')
+            }
+        });
+    }
+})
+
+// @desc    Validate Email
+// @route   POST /api/users/validate
+// @access  Public
+const validateUserEmail = asyncHandler(async(req, res) => {
+    const { email } = req.body
+    var otp = Math.floor(100000 + Math.random() * 900000)
+    const options = {
+        auth: {
+            api_key: process.env.SENDGRID_API_KEY
+        }
+    }
+    const transporter = nodemailer.createTransport(sendgridTransport(options))
+    var mailOptions = {
+        from: 'namayjain.jainnamay@gmail.com',
+        to: email,
+        subject: "Your OTP is: ",
+        html: "<h3>Your OTP is </h3>" + "<h1 style='font-weight:bold;'>" + otp + "</h1>"
+    }
+    transporter.sendMail(mailOptions, async(error, info) => {
+        if (error) {
+            console.log(error)
+            throw new Error('Error sending OTP')
+        }
+        res.json({
+            otp,
+            email: req.body.email
+        })
+    });
+})
+
+// @desc    Verify OTP
+// @route   POST /api/users/otp/verify
+// @access  Public
+const verifyOtp = asyncHandler(async(req, res) => {
+    const { otp, email } = req.body
+    if (!otp) {
+        res.status(404)
+        throw new Error("Invalid OTP")
+    }
+    const user = await User.findOne({ email: email })
+    if (!user) {
+        res.status(404)
+        throw new Error("User not found")
+    }
+    if (Date.now() > user.expireToken) {
+        res.status(401)
+        throw new Error("OTP Expired")
+    }
+    if (otp.toString() === user.otp.toString()) {
+        user.otp = ""
+        user.expireOtp = undefined
+        await user.save()
+        res.status(200).json({ message: "OTP Verified" })
+    }
+    res.status(404)
+    throw new Error("Invalid OTP")
 })
 
 // @desc    Register a new user
@@ -232,4 +353,17 @@ const updateUser = asyncHandler(async(req, res) => {
     }
 })
 
-export { authUser, getUserProfile, registerUser, updateUserProfile, getUsers, deleteUser, getUserById, updateUser, rechargeWallet }
+export {
+    authUser,
+    getUserProfile,
+    registerUser,
+    getOtp,
+    verifyOtp,
+    validateUserEmail,
+    updateUserProfile,
+    getUsers,
+    deleteUser,
+    getUserById,
+    updateUser,
+    rechargeWallet
+}

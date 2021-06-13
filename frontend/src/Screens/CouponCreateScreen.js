@@ -18,6 +18,7 @@ const CouponCreateScreen = ({ history }) => {
     const [discountAmount, setDiscountAmount] = useState('')
     const [discountUpto, setDiscountUpto] = useState('')
     const [minAmountRequired, setMinAmountRequired] = useState('')
+    const [validTill, setValidTill] = useState("")
 
     const toggleDiscountType = (e) => {
         const toggle = e.target.checked
@@ -55,7 +56,8 @@ const CouponCreateScreen = ({ history }) => {
             discountType,
             discountUpto,
             discountAmount,
-            minAmountRequired
+            minAmountRequired,
+            expiry: validTill
         }))
     }
 
@@ -93,6 +95,10 @@ const CouponCreateScreen = ({ history }) => {
                         <FormGroup controlId='upto'>
                             <FormLabel>Min amount required: </FormLabel>
                             <FormControl type='number' placeholder='Min amount Required' value={minAmountRequired} onChange={(e) => setMinAmountRequired(e.target.value)}></FormControl>
+                        </FormGroup>
+                        <FormGroup controlId='upto'>
+                            <FormLabel>Valid Till (In Days): </FormLabel>
+                            <FormControl type='number' placeholder='Valid Till' value={validTill} onChange={(e) => setValidTill(e.target.value)}></FormControl>
                         </FormGroup>
                         <Button type='submit' variant='primary'>
                             Create

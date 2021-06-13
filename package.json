@@ -36,11 +36,9 @@
         "mongoose": "^5.10.11",
         "morgan": "^1.10.0",
         "multer": "^1.4.2",
-        "rand-token": "^1.0.1",
-        "react-confirm-alert": "^2.7.0",
-        "react-toggle": "^4.1.2",
-        "react-uuid": "^1.0.2",
-        "styled-components": "^5.2.1"
+        "nodemailer": "^6.6.1",
+        "nodemailer-sendgrid-transport": "^0.2.0",
+        "rand-token": "^1.0.1"
     },
     "devDependencies": {
         "concurrently": "^5.3.0",

@@ -59,6 +59,7 @@ const CouponListScreen = ({ history }) => {
                                     <div className='id py-2 px-3 mb-3 bg-dark text-light'>{coupon._id}</div>
                                     <Button variant='success' style={{ borderRadius: '0' }} className='mb-3 price'>Code: {coupon.code}</Button>
                                     <div className='mb-3 price'>Discount Type: <span className="text-uppercase">{coupon.discountType}</span></div>
+                                    <div className='mb-3 price'>Valid Till: <span className="text-uppercase">{new Date(coupon.expiry).toDateString()} {new Date(coupon.expiry).toLocaleTimeString()}</span></div>
                                     {coupon.discountType.toLowerCase() === 'flat' ? (
                                         <div className='mb-3 price'>Discount: &#8377;{coupon.discountAmount}</div>
                                     ) : (

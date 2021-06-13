@@ -3,13 +3,16 @@ import { useEffect } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import { Button, Col, Form, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { listMyOrders } from '../Actions/orderActions'
+import { cancelOrder, listMyOrders } from '../Actions/orderActions'
 import { getUserDetails, updateUserDetails } from '../Actions/userActions'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
 import styled from 'styled-components'
 import { TiTick } from 'react-icons/ti'
 import { GoDash } from 'react-icons/go'
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import { ORDER_CANCEL_RESET } from '../constants/orderConstants'
 
 const ProfileScreen = ({ history }) => {
     const [name, setName] = useState('')
@@ -29,12 +32,19 @@ const ProfileScreen = ({ history }) => {
     const userUpdateProfile = useSelector(state => state.userUpdateProfile)
     const { success } = userUpdateProfile
 
+    const orderCancel = useSelector(state => state.orderCancel)
+    const { loading: loadingCancel, success: successCancel } = orderCancel
+
     const orderListMy = useSelector((state) => state.orderListMy)
     const { loading: loadingOrders, error: errorOrders, orders } = orderListMy
 
     useEffect(() => {
         if (!userInfo) {
             history.push('/login')
+        } else if (successCancel) {
+            dispatch({
+                type: ORDER_CANCEL_RESET
+            })
         } else {
             if (!user.name || (user._id !== userInfo._id)) {
                 dispatch(getUserDetails('profile'))
@@ -44,7 +54,7 @@ const ProfileScreen = ({ history }) => {
                 setEmail(user.email)
             }
         }
-    }, [dispatch, history, userInfo, user, success, orders])
+    }, [dispatch, history, userInfo, user, success, orders, successCancel])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -60,6 +70,32 @@ const ProfileScreen = ({ history }) => {
         }
     }
 
+    const cancelOrderHandler = (order) => {
+        confirmAlert({
+            title: `Cancel Order`,
+            message: 'Are you sure??',
+            buttons: [
+                {
+                    label: 'Confirm',
+                    onClick: () => {
+                        dispatch(cancelOrder(order))
+                        if (order.isPaid) {
+                            const amount = Number(user.wallet) + Number(order.totalPrice)
+                            dispatch(updateUserDetails({
+                                id: user._id,
+                                wallet: amount.toFixed(2),
+                            }))
+                        }
+                    }
+                },
+                {
+                    label: 'Cancel',
+                    onClick: () => { }
+                },
+            ],
+        })
+    }
+
     console.log(orders)
 
     return (
@@ -69,6 +105,7 @@ const ProfileScreen = ({ history }) => {
                 {message && <Message variant='danger'>{message}</Message>}
                 {error && <Message variant='danger'>{error}</Message>}
                 {success && <Message variant='success'>Profile Updated</Message>}
+                {successCancel && <Message variant='success'>OrderCancelled</Message>}
                 {loading && <Loader />}
                 <Form onSubmit={submitHandler}>
                     <FormGroup controlId='name'>
@@ -77,7 +114,13 @@ const ProfileScreen = ({ history }) => {
                     </FormGroup>
                     <FormGroup controlId='email'>
                         <FormLabel>Email: </FormLabel>
-                        <FormControl type='email' placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)}></FormControl>
+                        <FormControl
+                            type='email'
+                            placeholder='Email'
+                            value={email}
+                            disabled
+                            onChange={(e) => setEmail(e.target.value)}
+                        ></FormControl>
                     </FormGroup>
                     <FormGroup controlId='password'>
                         <FormLabel>Password: </FormLabel>
@@ -133,6 +176,14 @@ const ProfileScreen = ({ history }) => {
                                                 Delivered At: {order.deliveredAt ? order.deliveredAt.substring(0, 10) : <GoDash fontSize='2rem' color='blue' />}
                                             </Col>
                                         </div>
+                                        <div className='cancelled row mb-3'>
+                                            <Col sm={4}>
+                                                Cancelled: {order.isCancelled ? <TiTick fontSize='1.5rem' color='green' /> : <FaTimes fontSize='1.5rem' color='red' />}
+                                            </Col>
+                                            <Col sm={7}>
+                                                Cancelled At: {order.cancelledAt ? order.cancelledAt.substring(0, 10) : <GoDash fontSize='2rem' color='blue' />}
+                                            </Col>
+                                        </div>
                                         <ButtonContainerWrapper>
                                             <Button
                                                 variant='info'
@@ -145,7 +196,20 @@ const ProfileScreen = ({ history }) => {
                                                 onClick={() => history.push(`/order/${order._id}`)}
                                             >
                                                 View Order
-                                        </Button>
+                                            </Button>
+                                            {!order.isDelivered && !order.isCancelled && (
+                                                <Button
+                                                    variant='danger'
+                                                    style={{
+                                                        fontSize: '1.2rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '2px',
+                                                    }}
+                                                    onClick={(o) => cancelOrderHandler(order)}
+                                                >
+                                                    Cancel Order
+                                                </Button>
+                                            )}
                                         </ButtonContainerWrapper>
                                     </div>
                                 )
@@ -198,7 +262,7 @@ const OrderWrapper = styled.div`
         font-family: sans-serif;
         font-weight: bold;
     }
-    .paid, .delivered {
+    .paid, .delivered, .cancelled {
         font-size: 1.2rem;
         letter-spacing: 2px;
         display: flex;

@@ -7,7 +7,7 @@ import CheckoutSteps from '../Components/CheckoutSteps'
 
 const PaymentScreen = ({ history }) => {
 
-    const [paymentMethod, setPaymentMethod] = useState('PayPal')
+    const [paymentMethod, setPaymentMethod] = useState('Cash')
 
     const dispatch = useDispatch();
 

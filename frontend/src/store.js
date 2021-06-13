@@ -3,8 +3,8 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { productCreateReducer, productDeleteReducer, productDetailsReducer, productListReducer, productReviewCreateReducer, productTopRatedReducer, productUpdateReducer } from './Reducers/productReducers'
 import { cartReducer } from './Reducers/cartReducers'
-import { rechargeWalletReducer, userDeleteReducer, userDetailsReducer, userListReducer, userLoginReducer, userRegisterReducer, userUpdateProfileReducer, userUpdateReducer } from './Reducers/userReducer'
-import { orderCreateReducer, orderdeliverReducer, orderDetailsReducer, orderGetReadyReducer, orderListMyReducer, orderListReducer, orderPayReducer, orderReadyReducer } from './Reducers/orderReducer'
+import { otpVerifyReducer, rechargeWalletReducer, userDeleteReducer, userDetailsReducer, userListReducer, userLoginReducer, userOtpReducer, userRegisterReducer, userUpdateProfileReducer, userUpdateReducer, validateEmailReducer } from './Reducers/userReducer'
+import { orderCancelReducer, orderCreateReducer, orderdeliverReducer, orderDetailsReducer, orderGetReadyReducer, orderListMyReducer, orderListReducer, orderPayReducer, orderReadyReducer } from './Reducers/orderReducer'
 import { couponCreateReducer, couponDeleteReducer, couponGetReducer, couponListMyReducer, couponListReducer, couponUpdateReducer } from './Reducers/couponReducer'
 
 const reducer = combineReducers({
@@ -18,6 +18,9 @@ const reducer = combineReducers({
     cart: cartReducer,
     userLogin: userLoginReducer,
     userRegister: userRegisterReducer,
+    emailValidation: validateEmailReducer,
+    userOtp: userOtpReducer,
+    otpVerify: otpVerifyReducer,
     userDetails: userDetailsReducer,
     userUpdateProfile: userUpdateProfileReducer,
     userList: userListReducer,
@@ -28,6 +31,7 @@ const reducer = combineReducers({
     orderDetails: orderDetailsReducer,
     orderPay: orderPayReducer,
     orderDeliver: orderdeliverReducer,
+    orderCancel: orderCancelReducer,
     orderReady: orderReadyReducer,
     orderGetReady: orderGetReadyReducer,
     orderListMy: orderListMyReducer,

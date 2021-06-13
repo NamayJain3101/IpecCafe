@@ -116,7 +116,7 @@ const PlaceOrderScreen = ({ history }) => {
                                         onClick={placeOrderHandler}
                                     >
                                         Place Order
-                                </Button>
+                                    </Button>
                                 </ListGroupItem>
                             </ListGroup>
                         </Card>

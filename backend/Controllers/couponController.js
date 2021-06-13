@@ -5,9 +5,10 @@ import Coupon from '../Models/couponsModel.js'
 // @route   POST /api/coupons
 // @access  Private/Admin
 const createCoupon = asyncHandler(async(req, res) => {
-    const { code, discountType, discountAmount, minAmountRequired } = req.body.coupon
+    const { code, discountType, discountAmount, minAmountRequired, expiry } = req.body.coupon
     const discountUpto = req.body.coupon.discountType.toLowerCase() === 'flat' ? discountAmount : req.body.coupon.discountUpto
     const couponExist = await Coupon.findOne({ code })
+    const expiryDate = Date.now() + (86400000 * expiry)
 
     const regExpCode = /([A-Z0-9]){3,}$/g
     if (!regExpCode.test(code)) {
@@ -24,7 +25,8 @@ const createCoupon = asyncHandler(async(req, res) => {
             discountType,
             discountAmount,
             discountUpto,
-            minAmountRequired
+            minAmountRequired,
+            expiry: expiryDate
         })
         const createdCoupon = await coupon.save()
         res.status(201).json(createdCoupon)
@@ -75,6 +77,9 @@ const getCouponByCode = asyncHandler(async(req, res) => {
     if (coupon) {
         if (amount < coupon.minAmountRequired) {
             throw new Error(`Coupon applicable on min transaction of Rs${coupon.minAmountRequired}`)
+        }
+        if (coupon.expiry < Date.now()) {
+            throw new Error(`Coupon Expired`)
         }
         const alreadyApplied = coupon.users.find(r => r.user.toString() === req.user._id.toString())
         if (alreadyApplied) {

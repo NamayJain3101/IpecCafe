@@ -11,13 +11,14 @@ import Message from '../Components/Message'
 import Loader from '../Components/Loader'
 import { useState } from 'react'
 import { ORDER_DELIVER_RESET, ORDER_PAY_RESET } from '../constants/orderConstants'
-import { getUserDetails, updateUserDetails } from '../Actions/userActions'
+import { getOtp, getUserDetails, updateUserDetails, verifyUserOtp } from '../Actions/userActions'
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import { clearCart } from '../Actions/cartActions'
 import { COUPON_GET_RESET, COUPON_UPDATE_RESET } from '../constants/couponConstants'
 import { getCoupon, updateCoupon } from '../Actions/couponActions'
 import styled from 'styled-components'
+import { USER_OTP_RESET, USER_OTP_VERIFY_RESET } from '../constants/userConstants'
 
 const OrderScreen = ({ match, history }) => {
 
@@ -52,6 +53,12 @@ const OrderScreen = ({ match, history }) => {
 
     const couponUpdate = useSelector((state) => state.couponUpdate)
     const { success: successCouponUpdate } = couponUpdate
+
+    const userOtp = useSelector(state => state.userOtp)
+    const { otp: recievedOtp } = userOtp
+
+    const otpVerify = useSelector(state => state.otpVerify)
+    const { success, error: errorVerifyingOtp } = otpVerify
 
     const [couponCode, setCouponCode] = useState('')
     const [discount, setDiscount] = useState(0)
@@ -105,11 +112,11 @@ const OrderScreen = ({ match, history }) => {
         if (successCoupon) {
             if (coupon.discountType === 'flat') {
                 setDiscount(Number(coupon.discountAmount).toFixed(2))
-                setPayAmount(Number(order.totalPrice - coupon.discountAmount).toFixed(2))
+                setPayAmount(Number(order && order.totalPrice - coupon.discountAmount).toFixed(2))
             } else {
-                const discount = (addDecimals(Number(((coupon.discountAmount / 100) * order.itemsPrice).toFixed(2)))) > coupon.discountUpto ? coupon.discountUpto : (addDecimals(Number(((coupon.discountAmount / 100) * order.itemsPrice).toFixed(2))))
+                const discount = (addDecimals(Number(((coupon.discountAmount / 100) * (order && order.itemsPrice)).toFixed(2)))) > coupon.discountUpto ? coupon.discountUpto : (addDecimals(Number(((coupon.discountAmount / 100) * order.itemsPrice).toFixed(2))))
                 setDiscount(Number(discount).toFixed(2))
-                setPayAmount(Number(order.totalPrice - discount).toFixed(2))
+                setPayAmount(Number(order && order.totalPrice - discount).toFixed(2))
             }
         }
         if (successCouponUpdate) {
@@ -146,6 +153,44 @@ const OrderScreen = ({ match, history }) => {
         dispatch(clearCart())
     }
 
+    const initiatePayment = () => {
+        dispatch(getOtp(userInfo.email))
+    }
+
+    useEffect(() => {
+        if (recievedOtp) {
+            dispatch({
+                type: USER_OTP_RESET
+            })
+            confirmAlert({
+                title: `PAY Rs${Number(payAmount)}`,
+                message: 'Confirm Payment',
+                childrenElement: () => <input type='password' name='paymentOtp' id='paymentOtp' />,
+                buttons: [
+                    {
+                        label: 'Confirm',
+                        onClick: () => {
+                            dispatch(verifyUserOtp(userInfo.email, document.getElementById('paymentOtp').value.toString()))
+                        }
+                    },
+                    {
+                        label: 'Cancel',
+                        onClick: () => { }
+                    },
+                ],
+            })
+        }
+    }, [dispatch, payAmount, recievedOtp, user.wallet, userInfo.email])
+
+    useEffect(() => {
+        if (success) {
+            dispatch({
+                type: USER_OTP_VERIFY_RESET
+            })
+            walletPaymentHandler()
+        }
+    }, [dispatch, success])
+
     const walletPaymentHandler = () => {
         dispatch(payOrder(orderId, {
             id: uuid(),
@@ -155,11 +200,6 @@ const OrderScreen = ({ match, history }) => {
             },
             update_time: Date.now()
         }, { discount: discount }))
-        // const wallet = user.wallet - order.totalPrice
-        // dispatch(updateUserDetails({
-        //     id: user._id,
-        //     wallet: wallet.toFixed(2)
-        // }))
         const amount = Number(user.wallet) - Number(payAmount)
         dispatch(updateUserDetails({
             id: user._id,
@@ -318,15 +358,21 @@ const OrderScreen = ({ match, history }) => {
                                             <Button onClick={codPaymentHandler} className='btn btn-block'>Pay On Delivery</Button>
                                         </ListGroupItem>
                                     )}
+                                    {errorVerifyingOtp && <Message variant="danger">{errorVerifyingOtp}</Message>}
                                     {!order.isPaid && (order.paymentMethod === 'Wallet') && (
                                         <ListGroupItem>
-                                            <Button onClick={walletPaymentHandler} className='btn btn-block'>Pay through Wallet</Button>
+                                            <Button
+                                                onClick={initiatePayment}
+                                                className='btn btn-block'
+                                                disabled={(userInfo.wallet <= payAmount && user.wallet <= payAmount)}
+                                            >Pay through Wallet</Button>
                                         </ListGroupItem>
                                     )}
+                                    {(userInfo.wallet <= payAmount) && (user.wallet <= payAmount) && <Message variant='danger'>Dont have enough in the wallet</Message>}
                                     {loadingDeliver && <Loader />}
                                     {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                                         <ListGroupItem>
-                                            <Button type='button' className='btn btn-block' onClick={(code) => deliverHandler(order.deliveryCode)}>
+                                            <Button type='button' disabled={order.isCancelled} className='btn btn-block' onClick={(code) => deliverHandler(order.deliveryCode)}>
                                                 Mark as Delivered
                                             </Button>
                                         </ListGroupItem>

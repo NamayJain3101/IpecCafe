@@ -6,11 +6,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../Components/Loader'
 import Message from '../Components/Message'
 import { Button, Col } from 'react-bootstrap'
-import { listOrders, markOrderAsReady } from '../Actions/orderActions'
+import { cancelOrder, listOrders, markOrderAsReady } from '../Actions/orderActions'
 import { ORDER_DETAILS_RESET } from '../constants/orderConstants'
 import Paginate from '../Components/Paginate'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import { updateUser } from '../Actions/userActions'
 
 const OrderListScreen = ({ history, match }) => {
     const pageNumber = match.params.pageNumber
@@ -25,6 +28,12 @@ const OrderListScreen = ({ history, match }) => {
 
     const orderReady = useSelector(state => state.orderReady)
     const { success } = orderReady
+
+    const orderCancel = useSelector(state => state.orderCancel)
+    const { loading: loadingCancel } = orderCancel
+
+    const userDetails = useSelector(state => state.userDetails)
+    const { user } = userDetails
 
     useEffect(() => {
         dispatch({
@@ -41,12 +50,38 @@ const OrderListScreen = ({ history, match }) => {
         dispatch(markOrderAsReady(order))
     }
 
+    const cancelOrderHandler = (order) => {
+        confirmAlert({
+            title: `Cancel Order`,
+            message: 'Are you sure??',
+            buttons: [
+                {
+                    label: 'Confirm',
+                    onClick: () => {
+                        dispatch(cancelOrder(order))
+                        if (order.isPaid) {
+                            const amount = Number(user.wallet) + Number(order.totalPrice)
+                            dispatch(updateUser({
+                                id: user._id,
+                                wallet: amount.toFixed(2),
+                            }))
+                        }
+                    }
+                },
+                {
+                    label: 'Cancel',
+                    onClick: () => { }
+                },
+            ],
+        })
+    }
+
     console.log(orders)
 
     return (
         <React.Fragment>
             <h1>Orders</h1>
-            {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
+            {loading || loadingCancel ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
                 <React.Fragment>
                     <OrderWrapper>
                         {orders.map(order => {
@@ -93,6 +128,14 @@ const OrderListScreen = ({ history, match }) => {
                                             Delivered At: {order.deliveredAt ? order.deliveredAt.substring(0, 10) : <GoDash fontSize='2rem' color='blue' />}
                                         </Col>
                                     </div>
+                                    <div className='cancelled row mb-3'>
+                                        <Col sm={4}>
+                                            Cancelled: {order.isCancelled ? <TiTick fontSize='1.5rem' color='green' /> : <FaTimes fontSize='1.5rem' color='red' />}
+                                        </Col>
+                                        <Col sm={7}>
+                                            Cancelled At: {order.cancelledAt ? order.cancelledAt.substring(0, 10) : <GoDash fontSize='2rem' color='blue' />}
+                                        </Col>
+                                    </div>
                                     <ButtonContainerWrapper>
                                         <Button
                                             variant='info'
@@ -106,7 +149,7 @@ const OrderListScreen = ({ history, match }) => {
                                         >
                                             View Order
                                         </Button>
-                                        {!order.isDelivered && (
+                                        {!order.isDelivered && !order.isCancelled && (
                                             <Link to='/orders/ready' target={'mainWindow'}>
                                                 <Button
                                                     variant='success'
@@ -114,6 +157,7 @@ const OrderListScreen = ({ history, match }) => {
                                                         fontSize: '1.2rem',
                                                         textTransform: 'uppercase',
                                                         letterSpacing: '2px',
+                                                        marginRight: '1rem'
                                                     }}
                                                     disabled={order.ready}
                                                     onClick={(o) => readyOrderHandler(order)}
@@ -121,6 +165,19 @@ const OrderListScreen = ({ history, match }) => {
                                                     Mark as ready
                                                 </Button>
                                             </Link>
+                                        )}
+                                        {!order.isDelivered && !order.isPaid && !order.isCancelled && (
+                                            <Button
+                                                variant='danger'
+                                                style={{
+                                                    fontSize: '1.2rem',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '2px',
+                                                }}
+                                                onClick={(o) => cancelOrderHandler(order)}
+                                            >
+                                                Cancel Order
+                                            </Button>
                                         )}
                                     </ButtonContainerWrapper>
                                 </div>
@@ -174,7 +231,7 @@ const OrderWrapper = styled.div`
         font-family: sans-serif;
         font-weight: bold;
     }
-    .paid, .delivered {
+    .paid, .delivered, .cancelled {
         font-size: 1.2rem;
         letter-spacing: 2px;
         display: flex;
