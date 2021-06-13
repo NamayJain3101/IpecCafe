@@ -9,6 +9,77 @@
     <meta name="description" content="Find the best products with cheapest prices" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script src="https://formspree.io/js/formbutton-v1.min.js" defer></script>
+    <script>
+        window.formbutton = window.formbutton || function() {
+            (formbutton.q = formbutton.q || []).push(arguments)
+        };
+        formbutton("create", {
+            action: "https://formspree.io/mgerykoo",
+            styles: {
+                fontFamily: '"Lato", sans-serif',
+                button: {
+                    background: "green",
+                    color: "white"
+                },
+                title: {
+                    background: "green",
+                    letterSpacing: "1px",
+                    textTransform: "uppercase"
+                },
+                description: {
+                    background: "green",
+                    letterSpacing: "1px",
+                    textTransform: "uppercase",
+                },
+                body: {
+                    marginTop: "0.5rem"
+                },
+                input: {
+                    border: "1px solid green",
+                    padding: "7px 14px",
+                    fontSize: "1.1rem",
+                    "margin": "8px auto"
+                },
+            },
+            title: "Let's Connect!",
+            description: "Send us your fedbacks and we will try to improve",
+            fields: [{
+                name: "name",
+                type: "text",
+                label: "Your Name",
+                required: true,
+            }, {
+                name: "email",
+                type: "email",
+                label: "Your Email",
+                required: true
+            }, {
+                name: "Message",
+                type: "textarea",
+                labe: "Message",
+                required: true
+            }, {
+                type: "submit",
+                style: {
+                    input: {
+                        background: "green",
+                        width: "100%",
+                        padding: "7px 14px",
+                        fontSize: "1.1rem",
+                        color: "white"
+                    }
+                }
+            }],
+            onResponse: function(ok, setStatus) {
+                if (ok) {
+                    setStatus("Your request was received. We'll be in touch shortly.");
+                } else {
+                    setStatus("<span style='color:red'>There was a problem. We've been notified.</span>");
+                }
+            }
+        })
+    </script>
     <title>IPEC CAFE</title>
 </head>
 

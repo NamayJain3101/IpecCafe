@@ -6,7 +6,6 @@ const ContactUsPage = () => {
 
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
-    const [phone, setPhone] = useState("")
     const [feedback, setFeedback] = useState("")
 
     return (
@@ -25,10 +24,6 @@ const ContactUsPage = () => {
                     <div className="form-group">
                         <label htmlFor="email">Email: </label>
                         <input type='email' required value={email} name='email' id='email' className='form-control' onChange={(e) => setEmail(e.target.value)} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="phone">Mobile Number: </label>
-                        <input type='tel' required pattern="[6-9][0-9]{9}" value={phone} name='phone' id='phone' className='form-control' onChange={(e) => setPhone(e.target.value)} />
                     </div>
                     <div className="form-group">
                         <label htmlFor="feedback">Feedback: </label>
