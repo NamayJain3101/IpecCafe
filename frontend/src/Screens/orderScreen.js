@@ -68,7 +68,7 @@ const OrderScreen = ({ match, history }) => {
         const addDecimals = (num) => {
             return (Math.round(num * 100) / 100).toFixed(2)
         }
-        order.itemsPrice = addDecimals(order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0))
+        order.itemsPrice = addDecimals(order && order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0))
     }
 
     useEffect(() => {
@@ -90,6 +90,7 @@ const OrderScreen = ({ match, history }) => {
             if (!order || (order._id !== orderId) || successPay || successDeliver) {
                 dispatch({ type: ORDER_PAY_RESET })
                 dispatch({ type: ORDER_DELIVER_RESET })
+                dispatch({ type: USER_OTP_RESET })
                 dispatch(getOrderDetails(orderId))
             } else if (!order.isPaid) {
                 if (!window.paypal) {
@@ -162,6 +163,7 @@ const OrderScreen = ({ match, history }) => {
             dispatch({
                 type: USER_OTP_RESET
             })
+            console.log("otp")
             confirmAlert({
                 title: `PAY Rs${Number(payAmount)}`,
                 message: 'Enter OTP sent to your Email',
@@ -356,7 +358,7 @@ const OrderScreen = ({ match, history }) => {
                                     )}
                                     {!order.isPaid && (order.paymentMethod === 'Cash') && (
                                         <ListGroupItem>
-                                            <Button onClick={codPaymentHandler} className='btn btn-block'>Pay On Delivery</Button>
+                                            <Button onClick={codPaymentHandler} disabled={order.isCancelled} className='btn btn-block'>Pay On Delivery</Button>
                                         </ListGroupItem>
                                     )}
                                     {errorVerifyingOtp && <Message variant="danger">{errorVerifyingOtp}</Message>}
@@ -365,7 +367,7 @@ const OrderScreen = ({ match, history }) => {
                                             <Button
                                                 onClick={initiatePayment}
                                                 className='btn btn-block'
-                                                disabled={(userInfo.wallet <= payAmount && user.wallet <= payAmount)}
+                                                disabled={(userInfo.wallet <= payAmount && user.wallet <= payAmount) || order.isCancelled}
                                             >Pay through Wallet</Button>
                                         </ListGroupItem>
                                     )}
@@ -373,7 +375,7 @@ const OrderScreen = ({ match, history }) => {
                                     {loadingDeliver && <Loader />}
                                     {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                                         <ListGroupItem>
-                                            <Button type='button' disabled={order.isCancelled} className='btn btn-block' onClick={(code) => deliverHandler(order.deliveryCode)}>
+                                            <Button type='button' disabled={order.isCancelled || !order.ready} className='btn btn-block' onClick={(code) => deliverHandler(order.deliveryCode)}>
                                                 Mark as Delivered
                                             </Button>
                                         </ListGroupItem>

@@ -33,7 +33,7 @@ const ProfileScreen = ({ history }) => {
     const { success } = userUpdateProfile
 
     const orderCancel = useSelector(state => state.orderCancel)
-    const { loading: loadingCancel, success: successCancel } = orderCancel
+    const { success: successCancel } = orderCancel
 
     const orderListMy = useSelector((state) => state.orderListMy)
     const { loading: loadingOrders, error: errorOrders, orders } = orderListMy
@@ -45,6 +45,7 @@ const ProfileScreen = ({ history }) => {
             dispatch({
                 type: ORDER_CANCEL_RESET
             })
+            dispatch(listMyOrders())
         } else {
             if (!user.name || (user._id !== userInfo._id)) {
                 dispatch(getUserDetails('profile'))
@@ -95,8 +96,6 @@ const ProfileScreen = ({ history }) => {
             ],
         })
     }
-
-    console.log(orders)
 
     return (
         <Row>
