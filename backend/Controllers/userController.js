@@ -9,9 +9,7 @@ import sendgridTransport from 'nodemailer-sendgrid-transport'
 // @access  Public
 const authUser = asyncHandler(async(req, res) => {
     const { email, password } = req.body
-    console.log(email, password)
     const user = await User.findOne({ email })
-    console.log(user)
     if (password !== 'otp') {
         if (user && (await user.matchPassword(password))) {
             res.json({
@@ -64,7 +62,11 @@ const getOtp = asyncHandler(async(req, res) => {
             from: 'namayjain.jainnamay@gmail.com',
             to: email,
             subject: "Your OTP is: ",
-            html: "<h3>Your OTP is </h3>" + "<h1 style='font-weight:bold;'>" + otp + "</h1>"
+            html: `
+                    <h3>Your OTP is </h3>
+                    <h1 style='font-weight:bold;'>${otp}</h1>
+                    <h5 style='font-weight:bold;'>OTP is Valid for 3 minutes</h5>
+                `
         }
         transporter.sendMail(mailOptions, async(error, info) => {
             if (error) {
@@ -72,7 +74,7 @@ const getOtp = asyncHandler(async(req, res) => {
                 throw new Error('Error sending OTP')
             }
             user.otp = otp
-            user.expireOtp = Date.now() + 3600000
+            user.expireOtp = Date.now() + 180000
             const updatedUser = await user.save()
             if (updatedUser) {
                 res.json({
@@ -130,7 +132,7 @@ const verifyOtp = asyncHandler(async(req, res) => {
         res.status(404)
         throw new Error("User not found")
     }
-    if (Date.now() > user.expireToken) {
+    if (Date.now() > user.expireOtp) {
         res.status(401)
         throw new Error("OTP Expired")
     }

@@ -82,6 +82,7 @@ const RegisterScreen = ({ location, history }) => {
             {error && <Message variant='danger'>{error}</Message>}
             {successVerification && <Message variant='success'>{successVerification}</Message>}
             {otpMessage && <Message variant='danger'>{otpMessage}</Message>}
+            {recievedOtp && <Message variant='success'>OTP Sent</Message>}
             {loading && <Loader />}
             <Form onSubmit={submitHandler}>
                 <FormGroup controlId='name'>

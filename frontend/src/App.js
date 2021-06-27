@@ -5,7 +5,6 @@ import Loader from './Components/Loader';
 
 const Footer = React.lazy(() => import('./Components/Footer'))
 const Header = React.lazy(() => import('./Components/Header'))
-const ContactUs = React.lazy(() => import('./Screens/ContactUsScreen'))
 const CartScreen = React.lazy(() => import('./Screens/CartScreen'))
 const HomeScreen = React.lazy(() => import('./Screens/HomeScreen'))
 const LoginScreen = React.lazy(() => import('./Screens/LoginScreen'))
@@ -55,7 +54,6 @@ const App = () => {
                         <Route path='/search/:keyword' exact component={HomeScreen} />
                         <Route path='/search/:keyword/page/:pageNumber' component={HomeScreen} />
                         <Route path='/page/:pageNumber' exact component={HomeScreen} />
-                        <Route path='/contact-us' exact component={ContactUs} />
                         <Route path='/' exact component={HomeScreen} />
                     </Container>
                 </main>

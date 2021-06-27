@@ -19,16 +19,16 @@
             styles: {
                 fontFamily: '"Lato", sans-serif',
                 button: {
-                    background: "green",
+                    background: "#17a2b8",
                     color: "white"
                 },
                 title: {
-                    background: "green",
+                    background: "#17a2b8",
                     letterSpacing: "1px",
                     textTransform: "uppercase"
                 },
                 description: {
-                    background: "green",
+                    background: "#17a2b8",
                     letterSpacing: "1px",
                     textTransform: "uppercase",
                 },
@@ -36,14 +36,14 @@
                     marginTop: "0.5rem"
                 },
                 input: {
-                    border: "1px solid green",
+                    border: "1px solid #17a2b8",
                     padding: "7px 14px",
                     fontSize: "1.1rem",
                     "margin": "8px auto"
                 },
             },
-            title: "Let's Connect!",
-            description: "Send us your fedbacks and we will try to improve",
+            title: "What you need",
+            description: "Send us your requirements",
             fields: [{
                 name: "name",
                 type: "text",
@@ -63,7 +63,7 @@
                 type: "submit",
                 style: {
                     input: {
-                        background: "green",
+                        background: "#17a2b8",
                         width: "100%",
                         padding: "7px 14px",
                         fontSize: "1.1rem",
@@ -73,9 +73,9 @@
             }],
             onResponse: function(ok, setStatus) {
                 if (ok) {
-                    setStatus("Your request was received. We'll be in touch shortly.");
+                    setStatus("Your request was received. We'll try to deliver it.");
                 } else {
-                    setStatus("<span style='color:red'>There was a problem. We've been notified.</span>");
+                    setStatus("<span style='color:red'>Oops! Error occured while submitting</span>");
                 }
             }
         })

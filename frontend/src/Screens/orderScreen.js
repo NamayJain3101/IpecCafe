@@ -164,7 +164,7 @@ const OrderScreen = ({ match, history }) => {
             })
             confirmAlert({
                 title: `PAY Rs${Number(payAmount)}`,
-                message: 'Confirm Payment',
+                message: 'Enter OTP sent to your Email',
                 childrenElement: () => <input type='password' name='paymentOtp' id='paymentOtp' />,
                 buttons: [
                     {
@@ -189,7 +189,8 @@ const OrderScreen = ({ match, history }) => {
             })
             walletPaymentHandler()
         }
-    }, [dispatch, success])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [success])
 
     const walletPaymentHandler = () => {
         dispatch(payOrder(orderId, {
@@ -240,7 +241,7 @@ const OrderScreen = ({ match, history }) => {
     return (
         loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
             <React.Fragment>
-                {userInfo && userInfo.isAdmin && <Link to='/admin/orderlist' className='btn btn-light my-3'>Go Back</Link>}
+                <Button variant="light" className='btn btn-light my-3' onClick={() => history.go(-1)}>Go Back</Button>
                 <h1 style={{ overflow: 'auto' }}>Order {order._id}</h1>
                 {userInfo && order && !order.isDelivered && (
                     <h3>

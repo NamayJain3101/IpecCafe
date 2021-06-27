@@ -68,6 +68,7 @@ const LoginScreen = ({ location, history }) => {
             <h1>Sign In</h1>
             {error && <Message variant='danger'>{error}</Message>}
             {errorVerifyingOtp && <Message variant='danger'>{errorVerifyingOtp}</Message>}
+            {recievedOtp && <Message variant='success'>OTP Sent</Message>}
             {successVerification && <Message variant='success'>{successVerification}</Message>}
             {loading && <Loader />}
             <Form onSubmit={submitHandler}>
